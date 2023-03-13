@@ -3,10 +3,10 @@
 # Format input indels VCF for running ANGDS
 
 # manitou
-# srun -p small -c 1 -J 03.1_indels_format_VCF -o log/03.1_indels_format_VCF_%j.log /bin/sh 01_scripts/03.1_indels_format_VCF.sh &
+# srun -p small -c 1 --mem=50G -J 03.1_indels_format_VCF -o log/03.1_indels_format_VCF_%j.log /bin/sh 01_scripts/03.1_indels_format_VCF.sh &
 
 # valeria
-# srun -p ibis_small -c 1 -J 03.1_indels_format_VCF -o log/03.1_indels_format_VCF_%j.log /bin/sh 01_scripts/03.1_indels_format_VCF.sh &
+# srun -p ibis_small -c 1 --mem=50G -J 03.1_indels_format_VCF -o log/03.1_indels_format_VCF_%j.log /bin/sh 01_scripts/03.1_indels_format_VCF.sh &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -32,5 +32,8 @@ module load bcftools/1.13
 module load R/4.1
 
 # 1. Recode REF and ALT as dummy SNPs alleles (ANGSD does not work on non-SNPs variants)
-Rscript 01_scripts/utils/format_SVs_indels.R $RAW_INDEL_VCF $GENOME $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_INDEL_VCF)".recoded.vcf
+Rscript 01_scripts/utils/format_SVs_indels.R $RAW_INDEL_VCF $GENOME $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_INDEL_VCF)".recoded.tmp
 
+# 2. Remove tag INFO/INDEL, sort and index
+bcftools annotate -x INFO/INDEL $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_INDEL_VCF)".recoded.tmp | bcftools sort -Oz > $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_INDEL_VCF)".recoded.vcf.gz
+tabix -p vcf $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_INDEL_VCF)".recoded.vcf.gz -f
