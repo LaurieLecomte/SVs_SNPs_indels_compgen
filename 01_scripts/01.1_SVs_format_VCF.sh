@@ -34,6 +34,20 @@ module load R/4.1
 # 1. Convert GL tags to PL : otherwise, GL values are too small and likely impossible to compare with SNPs/indels
 bcftools +tag2tag $RAW_SV_VCF -- -r --gl-to-pl > $RAW_VCF_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_PL.vcf
 
-# 2. Recode REF and ALT as dummy SNPs alleles (ANGSD does not work on non-SNPs variants)
-Rscript 01_scripts/utils/format_SVs_indels.R $RAW_VCF_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_PL.vcf $GENOME $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.vcf
+## High school level log demo :
+# PL = -10*GL
+# PL = -10 * (log(10^GL) )/log10
+# PL = -10 * (GL * log10)/log10
+# PL = -10 * GL
 
+
+# 2. Recode REF and ALT as dummy SNPs alleles (ANGSD does not work on non-SNPs variants)
+Rscript 01_scripts/utils/format_SVs_indels.R $RAW_VCF_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_PL.vcf $GENOME $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.tmp
+
+# 3. Sort and index
+bcftools sort $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.tmp -Oz > $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.vcf.gz
+tabix -p vcf $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.vcf.gz
+
+# Clean up 
+#rm $RAW_VCF_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_PL.vcf
+#rm $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.tmp
