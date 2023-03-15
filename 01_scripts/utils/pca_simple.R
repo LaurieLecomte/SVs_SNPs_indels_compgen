@@ -83,7 +83,7 @@ if (all(rownames(pca_df) == names(kmeans_res$cluster) )) {
 }
 
 ## Plot
-jpeg(file = paste0(COV_MAT, ".pca_ggplot.jpg"))
+jpeg(file = paste0(COV_MAT, ".PC1_PC2.jpg"))
 par(mfrow = c(1,1))
 plot_PC1_PC2 <- ggplot(data = pca_df, aes(x = PC1, y = PC2, label = ID)) +
   geom_point(aes(col = POP, shape = factor(cluster))) +
@@ -96,6 +96,7 @@ plot_PC1_PC2
 
 dev.off()
 
+jpeg(file = paste0(COV_MAT, ".PC1_PC3.jpg"))
 plot_PC1_PC3 <- ggplot(data = pca_df, aes(x = PC1, y = PC3, label = ID)) +
   geom_point(aes(col = POP, shape = factor(cluster))) +
   geom_text(size = 1.5, hjust = 0, 
@@ -104,7 +105,9 @@ plot_PC1_PC3 <- ggplot(data = pca_df, aes(x = PC1, y = PC3, label = ID)) +
        title = paste("k_SS" ,k_ss) ) +
   scale_color_manual(values = c("red", "blue"))
 plot_PC1_PC3
+dev.off()
 
+jpeg(file = paste0(COV_MAT, ".PC2_PC3.jpg"))
 plot_PC2_PC3 <- ggplot(data = pca_df, aes(x = PC2, y = PC3, label = ID)) +
   geom_point(aes(col = POP, shape = factor(cluster))) +
   geom_text(size = 1.5, hjust = 0, 
@@ -113,6 +116,7 @@ plot_PC2_PC3 <- ggplot(data = pca_df, aes(x = PC2, y = PC3, label = ID)) +
        title = paste("k_SS" ,k_ss) ) +
   scale_color_manual(values = c("red", "blue"))
 plot_PC2_PC3
+dev.off()
 
 ## Store as rds object for easier handling
 saveRDS(plot_PC1_PC2, file = paste0(strsplit(x = COV_MAT, split = '.cov')[[1]],
