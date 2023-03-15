@@ -3,10 +3,10 @@
 # Convert VCF to beagle and normalize genotype likelihoods
 
 # manitou
-# srun -p small -c 1 -J 03.2_indels_saf_maf_all -o log/03.2_indels_saf_maf_all_%j.log /bin/sh 01_scripts/03.2_indels_saf_maf_all.sh &
+# srun -p small -c 1 -J 03.3_indels_vcf_to_beagle -o log/03.3_indels_vcf_to_beagle_%j.log /bin/sh 01_scripts/03.3_indels_vcf_to_beagle.sh &
 
 # valeria
-# srun -p ibis_small -c 1 -J 03.2_indels_saf_maf_all -o log/03.2_indels_saf_maf_all_%j.log /bin/sh 01_scripts/03.2_indels_saf_maf_all.sh &
+# srun -p ibis_small -c 1 -J 03.3_indels_vcf_to_beagle -o log/03.3_indels_vcf_to_beagle_%j.log /bin/sh 01_scripts/03.3_indels_vcf_to_beagle.sh &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"

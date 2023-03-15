@@ -80,4 +80,4 @@ gzip $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".nor
 # Clean up
 #for file in $(ls -1 $ANGSD_STATS_DIR/*.BEAGLE.PL); do rm $file; done
 for file in $(ls -1 $ANGSD_STATS_DIR/*.log); do rm $file; done
-rm $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents
+#rm $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents
