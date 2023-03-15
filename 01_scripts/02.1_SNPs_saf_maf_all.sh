@@ -87,4 +87,5 @@ head $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".bed
 # 5. Output filtered sites from VCF
 #bgzip $SNPS_VCF_ANGSD
 #tabix "$SNPS_VCF_ANGSD".gz
-bcftools view -R $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".bed $SNPS_VCF_ANGSD | bcftools sort -Oz > $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz
+bcftools view -R $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".bed $SNPS_VCF_ANGSD --threads $CPU | bcftools sort -Oz > $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz
+tabix -p vcf $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz -f
