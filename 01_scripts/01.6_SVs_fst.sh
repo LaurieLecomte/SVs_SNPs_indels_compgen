@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Compute SAF and MAF by pop
+# Estimate genome-wide and per-site Fst by populations pairs
 
 # manitou
 # srun -p small -c 4 --mem=50G -J 01.6_SVs_fst -o log/01.6_SVs_fst_%j.log /bin/sh 01_scripts/01.6_SVs_fst.sh &
@@ -87,7 +87,7 @@ do
    echo "Pre-Fst steps"
    ## warning : realSFS outputs will be reordered by numerical order, not the order in original VCF/reference fasta
    $REALSFS_PATH fst index $ANGSD_BYPOP_DIR/"$pop1".saf.idx $ANGSD_BYPOP_DIR/"$pop2".saf.idx \
-   -sfs $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".2dsfs \
+   -sfs $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".prior.2dsfs \
    -P $CPU -fstout $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2"
    
    echo "calculate SFS priori for each position"
@@ -95,7 +95,7 @@ do
    
    # 2.3 Compute genome-wide Fst
    echo "get genome-wide estimate of Fst"
-   $REALSFS_PATH fst stats $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".fst.idx -P $CPU > $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".fst
+   $REALSFS_PATH fst stats $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".fst.idx -P $CPU > $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".SVs.fst
    
    # 2.4 Compute Fst by sliding window
    $REALSFS_PATH fst stats2 $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".fst.idx -win $WINDOW -step $WIN_STEP -P $CPU > $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2"_win"$WINDOW"_step"$WIN_STEP".txt
@@ -117,16 +117,16 @@ do
    ## Index
    tabix -s1 -b2 -e2 $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -f
    
-   ## Prepare header : Add SVLEN tag
+   ## Prepare header : Add Fst tag
    echo -e "##INFO=<ID=FST_"$pop1"_"$pop2",Number=.,Type=Float,Description=\"Per site Fst between "$pop1" and "$pop2"\">" > $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr
    
    
    ## Annotate 
    #-a is the annotation file (tabix and bgzip, it needs at least CHROM and POS, -h are the header lines to add, -c are the meaning of the column in the annotation file
-   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $FILT_ANGSD_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/$GROUP/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".fst.vcf.gz"
+   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $FILT_ANGSD_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/$GROUP/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".SVsFst.vcf.gz"
    
    # 6. Add per site Fst to the input VCF that has NOT been formatted for angsd
-   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $RAW_SV_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/$GROUP/"$(basename -s .vcf $RAW_SV_VCF)".fst.vcf.gz"
+   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $RAW_SV_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/$GROUP/"$(basename -s .vcf.gz $RAW_SV_VCF)".SVsFst.vcf.gz"
    
    # Clean up 
    rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr
