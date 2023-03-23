@@ -40,6 +40,7 @@ POPS_FILE="02_infos/pops.txt"
 
 FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
 
+
 REALSFS_PATH="/prg/angsd/0.937/misc/realSFS"
 
 # LOAD REQUIRED MODULES
@@ -123,14 +124,14 @@ do
    
    ## Annotate 
    #-a is the annotation file (tabix and bgzip, it needs at least CHROM and POS, -h are the header lines to add, -c are the meaning of the column in the annotation file
-   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $FILT_ANGSD_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/$GROUP/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".SVsFst.vcf.gz"
+   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $FILT_ANGSD_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".SVsFst_"$pop1"_"$pop2".vcf.gz"
    
    # 6. Add per site Fst to the input VCF that has NOT been formatted for angsd
-   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $RAW_SV_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/$GROUP/"$(basename -s .vcf.gz $RAW_SV_VCF)".SVsFst.vcf.gz"
+   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $RAW_SV_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".SVsFst_"$pop1"_"$pop2".vcf.gz"
    
    # Clean up 
    rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr
-   rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz
+   #rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz
    rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz.tbi
    #rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.end
    #rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.tmp
