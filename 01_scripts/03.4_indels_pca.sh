@@ -39,7 +39,7 @@ MAX_MAF=0.95
 CHR_LIST="02_infos/chr_list.txt"
 
 INDELS_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.gz"
-COV_MAT="$PCA_DIR/"$(basename -s .norm.beagle.gz $INDELS_BEAGLE)".cov"
+COV_MAT="$PCA_DIR/"$(basename -s .norm.beagle.gz $INDELS_BEAGLE)""
 
 
 # LOAD REQUIRED MODULES
@@ -53,4 +53,4 @@ module load pcangsd/1.10
 pcangsd --threads $CPU --beagle $INDELS_BEAGLE --out $COV_MAT
 
 # 2. Run PCA in R
-Rscript 01_scripts/utils/pca_simple.R "$COV_MAT" $INDELS_BEAGLE $ID_SEX_POP
+Rscript 01_scripts/utils/pca_simple.R "$COV_MAT".cov $INDELS_BEAGLE $ID_SEX_POP
