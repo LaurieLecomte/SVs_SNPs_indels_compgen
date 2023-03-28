@@ -116,7 +116,7 @@ fst_per_site_plot <-
   theme(panel.spacing = unit(0.1, 'points'),
         strip.text.x = element_text(size = 6),
         axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
-        panel.background = element_rect(color = "gray70"),
+        panel.background = element_rect(color = "gray60"),
         strip.placement = "inside",
         strip.background = element_rect(colour = 'gray70')
   ) + 
