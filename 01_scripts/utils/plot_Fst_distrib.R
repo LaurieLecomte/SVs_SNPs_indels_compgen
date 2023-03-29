@@ -10,7 +10,7 @@ MEAN_FST <- argv[3]
 
 # Per site Fst
 fst_table <- read.table(INPUT_TABLE, 
-                        col.names = c('CHROM', 'POS', 'ID', 'FST'),
+                        col.names = c('CHROM', 'POS', 'END', 'ID', 'FST'),
                         na.strings = '.'
                         )
 

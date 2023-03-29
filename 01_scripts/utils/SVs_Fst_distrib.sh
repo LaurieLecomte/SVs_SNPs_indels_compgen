@@ -56,9 +56,9 @@ module load R/4.1
 module load bcftools/1.13
 
 # 1. Extract Fst value from VCF
-bcftools query -f "%CHROM\t%POS\t%ID\t%FST_"$POP1"_"$POP2"\n" $RAW_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table
+bcftools query -f "%CHROM\t%POS\t%END\t%ID\t%FST_"$POP1"_"$POP2"\n" $RAW_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table
 
-bcftools query -f "%CHROM\t%POS\t%ID\t%FST_"$POP1"_"$POP2"\n" $ANGSD_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table
+bcftools query -f "%CHROM\t%POS\t%END\t%ID\t%FST_"$POP1"_"$POP2"\n" $ANGSD_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table
 
 # 2. Plot Fst distribution and per site Fst
 Rscript 01_scripts/utils/plot_Fst_distrib.R $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table 02_infos/OV_to_ssa.txt $ANGSD_FST_DIR/"$POP1"_"$POP2"/"$POP1"_"$POP2".SVs.fst
