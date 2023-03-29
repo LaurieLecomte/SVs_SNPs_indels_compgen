@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# Perform GO enrichment analysis on a set of genes located near (at 10000 bp) outlier SVs, given their high Fst (0.4)
-# Specify window size at positional arg 1, and min Fst threshold at positional arg 2
-# Launch in a conda env where goatools is installed
+# Perform RDA on SVs with population as the only explanatory variable
 
 # manitou
 # srun -p small -c 1 -J SVs_rda -o log/SVs_rda_%j.log /bin/sh 01_scripts/SVs_rda.sh &
@@ -44,8 +42,6 @@ POP2='PU'
 ANGSD_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".SVsFst_"$POP1"_"$POP2".vcf.gz" # VCF formatted for angsd, with added Fst values from previous script
 RAW_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".SVsFst_"$POP1"_"$POP2".vcf.gz" # input VCF (NOT the one formatted for angsd), with added Fst values from previous script
 
-OVERLAP_WIN=$1
-MIN_FST=$2
 
 ANNOT_TABLE="11_annotation/genome_annotation/"$(basename -s .tsv $GENOME_ANNOT)".bed"
 SV_BED="$ANNOT_DIR/SVs_"$POP1"_"$POP2".bed"
