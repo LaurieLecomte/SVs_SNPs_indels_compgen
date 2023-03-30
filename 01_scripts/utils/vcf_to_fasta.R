@@ -24,7 +24,8 @@ SV_infos$TYPE[SV_infos$LEN < 0] <- "DEL"
 # Convert POS and END to 0 based coordinates
 SV_infos$start_bed <- SV_infos$POS - 1 ## because bedfiles are 0-index
 SV_infos$stop_bed <- SV_infos$start_bed + SV_infos$ref_length
-SV_infos$chr_pos_id <- paste(SV_infos$CHR, SV_infos$POS, SV_infos$ID, sep = "_")
+#SV_infos$chr_pos_id <- paste(SV_infos$CHR, SV_infos$POS, SV_infos$ID, sep = "_") # we can't use ID because it contains > and RepeatMasker interprets this as multiple sequences
+SV_infos$chr_pos <- paste(SV_infos$CHR, SV_infos$POS, sep = '_')
 SV_infos$max_len <- pmax(SV_infos$alt_length, SV_infos$ref_length) - 1
 
 head(SV_infos)
@@ -40,20 +41,21 @@ fasta_vec <- vector(length = 4 * nSV)
 # Loop over SVs
 for (i in 1 : nSV ) {
   if (SV_infos$ref_length[i] > 1) { # likely a DEL, so we use REF seq
-    fasta_vec[4*i - 3] <- paste0(">", SV_infos$chr_pos_id[i], "-REF")
+    fasta_vec[4*i - 3] <- paste0(">", SV_infos$chr_pos[i], '_', SV_infos$ref_length[i], "-REF")
     fasta_vec[4*i - 2] <- SV_infos$REF[i]
-    } else if (SV_infos$alt_length[i] > 1) { # likely an INS, so we use ALT seq
-    fasta_vec[4*i - 1] <- paste0(">", SV_infos$chr_pos_id[i], "-ALT")
+    } 
+  if (SV_infos$alt_length[i] > 1) { # likely an INS, so we use ALT seq
+    fasta_vec[4*i - 1] <- paste0(">", SV_infos$chr_pos[i], '_', SV_infos$alt_length[i], "-ALT")
     fasta_vec[4*i] <- SV_infos$ALT[i]
     }
   }
-
+# we use if instead of if else because it allows to keep both ALT and REF in cases where REF nor ALT has length 1
 fasta_vec2 <- fasta_vec[-which(fasta_vec == FALSE)]
 
 
 # 4. Export ---------------------------------------------------------------
 # Export to bed
-write.table(SV_infos[, c('CHROM', 'start_bed', 'stop_bed', 'chr_pos_id')], 
+write.table(SV_infos[, c('CHROM', 'start_bed', 'stop_bed', 'chr_pos')], 
             file = paste0(strsplit(SV_SEQS, split = '.table')[[1]], ".bed"), 
             sep = "\t", row.names = FALSE, quote = FALSE, col.names = FALSE)
 
@@ -66,6 +68,8 @@ write.table(SV_infos,
             sep = "\t", row.names = FALSE, quote = FALSE, col.names = FALSE)
 
 # Save fasta
-write.table(cbind(fasta_vec2), 
-            file = paste0(strsplit(SV_SEQS, split = '.table')[[1]], ".fasta"), 
-            sep = "\t", row.names = FALSE, quote = FALSE, col.names = FALSE)
+#write.table(cbind(fasta_vec2), 
+#            file = paste0(strsplit(SV_SEQS, split = '.table')[[1]], ".fasta"), 
+#            sep = "\t", row.names = FALSE, quote = FALSE, col.names = FALSE)
+
+writeLines(fasta_vec2, paste0(strsplit(SV_SEQS, split = '.table')[[1]], ".fasta"), sep = "\n")

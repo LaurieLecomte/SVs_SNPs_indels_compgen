@@ -3,10 +3,10 @@
 # Run RepeatMasker on SVs sequences
 
 # manitou
-# srun -p small -c 1 -J SVs_TEs -o log/SVs_TEs_%j.log /bin/sh 01_scripts/SVs_TEs.sh &
+# srun -p small -c 10 -J SVs_TEs -o log/SVs_TEs_%j.log /bin/sh 01_scripts/SVs_TEs.sh &
 
 # valeria
-# srun -p ibis_small -c 1 -J SVs_TEs -o log/SVs_TEs_%j.log /bin/sh 01_scripts/SVs_TEs.sh &
+# srun -p ibis_small -c 10 -J SVs_TEs -o log/SVs_TEs_%j.log /bin/sh 01_scripts/SVs_TEs.sh &
 
 # VARIABLE
 GENOME="03_genome/genome.fasta"
@@ -45,9 +45,19 @@ RAW_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".SVsFst_"$POP1"_
 
 TE_DIR="TE"
 
+CPU=10
+
 # LOAD REQUIRED MODULES
 module load R/4.1
 module load bcftools/1.13
+
+module load gnu-openmpi/4.0.5
+module load exonerate/2.4.0
+module load RepeatMasker/4.0.8
+module load ncbiblast/2.6.0
+module load python/2.7
+module load maker/2.31.10
+
 
 # 1. Extract Required fields from VCF
 ## We use the original VCF that was NOT formatted for angsd
@@ -55,5 +65,13 @@ bcftools query -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\n' $RAW_FST_VCF > $TE_DIR/SVs_C
 
 # 2. Format into a fasta for running Repeat Masker
 Rscript 01_scripts/utils/vcf_to_fasta.R $TE_DIR/SVs_CHR_POS_ID_REF_ALT.table
+#Rscript 01_scripts/utils/extract_SV_fasta_LL.r $TE_DIR/SVs_CHR_POS_ID_REF_ALT.table $TE_DIR/SVs_CHR_POS_ID_REF_ALT_orig.fasta
 
-# 3. 
+# 3. Run RepeatMasker on SV sequences
+RepeatMasker $TE_DIR/SVs_CHR_POS_ID_REF_ALT.fasta -pa $CPU -lib $TE_DIR/salmo_TElib.fasta -dir $TE_DIR
+#RepeatMasker $TE_DIR/SVs_CHR_POS_ID_REF_ALT_orig.fasta -pa $CPU -lib $TE_DIR/salmo_TElib.fasta -dir $TE_DIR
+
+RepeatMasker $TE_DIR/SVs_CHR_POS_ID_REF_ALT.fasta -pa $CPU -species 'salmo salar' -dir $TE_DIR/species
+#RepeatMasker $TE_DIR/SVs_CHR_POS_ID_REF_ALT_orig.fasta -pa $CPU -species 'salmo salar' -dir $TE_DIR/species
+
+#RepeatMasker $TE_DIR/SVs_CHR_POS_ID_REF_ALT.fasta -pa $CPU -species 'salmo salar' -dir $TE_DIR/species $GENOME -gff
