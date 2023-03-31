@@ -57,7 +57,7 @@ module load bcftools/1.13
 module load R/4.1
 
 # 1. Produce a list of SNPs sites and IDs to make interpretation easier after RDA
-bcftools query -f '%CHROM\t%POS\t%ID\t%END\n' $RAW_FST_VCF > $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_ID_END.table
+bcftools query -f '%CHROM\t%POS\t%END\t%ID\n' $RAW_FST_VCF > $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table
 
 
 # 2. Convert VCF to genotype matrix
@@ -68,7 +68,7 @@ echo "imputation done"
 Rscript 01_scripts/utils/impute_missing.R $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".geno_mat.012 $ID_SEX_POP
 
 # 4. Run RDA
-Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_ID_END.table $RDA_DIR
+Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $RDA_DIR
 
 # 5. Get overlap of outlier sites with known genes
 tail -n+2 $RDA_DIR/RDA_outliers.txt > $RDA_DIR/SNPs_RDA_outliers.table

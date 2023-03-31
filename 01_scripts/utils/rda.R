@@ -9,7 +9,7 @@ library(ggplot2)
 argv <- commandArgs(T)
 FILE <- argv[1] # "$MAT_file"
 ID_SEX_POP <- argv[2]
-CHR_POS_ID_END <- argv[3]
+CHR_POS_END_ID <- argv[3]
 OUT_DIR <- argv[4]
 
 GEN_MAT_PATH <- paste0(FILE, ".imp")
@@ -122,9 +122,9 @@ cand$POS <- sapply(X = cand$snp, FUN = function(x) as.numeric(unlist(strsplit(x,
 #cand$END <- cand$POS + 1
 
 ## Add variant ID (relevant for SVs only)
-chr_pos_ID_end <- read.table(CHR_POS_ID_END, header = FALSE, col.names = c('CHROM', 'POS', 'ID', 'END'))
+chr_pos_end_ID <- read.table(CHR_POS_END_ID, header = FALSE, col.names = c('CHROM', 'POS', 'END', 'ID'))
 
-cand <- merge(cand, chr_pos_ID_end, by = c('CHROM', 'POS'))
+cand <- merge(cand, chr_pos_end_ID, by = c('CHROM', 'POS'))
 
 write.table(cand[, c('CHROM', 'POS', 'END', 'ID', 'loading')], file = paste0(OUT_DIR, '/RDA_outliers.txt'), sep = "\t", quote = FALSE, row.names = FALSE)
 
@@ -154,8 +154,9 @@ all_sites$site <- row.names(load.rda)
 all_sites$CHROM <- sapply(X = all_sites$site, FUN = function(x) unlist(strsplit(x, split = '_'))[1])
 all_sites$POS <- sapply(X = all_sites$site, FUN = function(x) as.numeric(unlist(strsplit(x, split = '_'))[2]))
 
-all_sites <- merge(all_sites, chr_pos_ID_end, by = c('CHROM', 'POS'))
-write.table(all_sites[, c('CHROM', 'POS', 'END', 'ID', 'RDA1', 'PC1')], file = paste0(OUT_DIR, '/RDA_all_sites.txt'), sep = "\t", quote = FALSE, row.names = FALSE)
+all_sites <- merge(all_sites, chr_pos_end_ID, by = c('CHROM', 'POS'))
+write.table(all_sites[, c('CHROM', 'POS', 'END', 'ID', 'RDA1', 'PC1')], 
+            file = paste0(OUT_DIR, '/RDA_all_sites.txt'), sep = "\t", quote = FALSE, row.names = FALSE)
 
 
 all_sites_RDA1 <- 

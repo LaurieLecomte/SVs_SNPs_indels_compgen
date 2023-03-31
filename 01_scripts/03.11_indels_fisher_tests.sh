@@ -1,13 +1,14 @@
 #!/bin/bash
 
-# Perform RDA on indels with population as the only explanatory variable
-# Specify window size at positional arg 1
+# Run Fisher tests on each site
+#  03.9_indels_rda.sh is a prequisite to this script, which uses the raw 012 matrix and CHROM_POS_END_ID files produced when doing RDA
+# Specify window size at positional arg 1 and max allowed q value at arg 2
 
 # manitou
-# srun -p small -c 2 --mem=30G -J 03.9_indels_rda -o log/03.9_indels_rda_%j.log /bin/sh 01_scripts/03.9_indels_rda.sh 10000 &
+# srun -p small -c 1 -J 03.11_indels_fisher_tests -o log/03.11_indels_fisher_tests_%j.log /bin/sh 01_scripts/03.11_indels_fisher_tests.sh 1000 0.01 &
 
 # valeria
-# srun -p ibis_small -c 2 --mem=30G -J 03.9_indels_rda -o log/03.9_indels_rda_%j.log /bin/sh 01_scripts/03.9_indels_rda.sh 10000 &
+# srun -p ibis_small -c 1 -J 03.11_indels_fisher_tests -o log/03.11_indels_fisher_tests_%j.log /bin/sh 01_scripts/03.11_indels_fisher_tests.sh 1000 0.01 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -50,27 +51,24 @@ GENOME_ANNOT="03_genome/annotation/genome_annotation_table_simplified_1.5.tsv"
 ANNOT_TABLE="03_genome/annotation/"$(basename -s .tsv $GENOME_ANNOT)".table"
 
 OVERLAP_WIN=$1
+MAX_QVAL=$2
+
+FISHER_DIR="11_fisher_tests/indels"
 
 # LOAD REQUIRED MODULES
 module load vcftools/0.1.16
 module load bcftools/1.13
+module load bedtools/2.30.0
 module load R/4.1
 
 
-# 1. Produce a list of indel sites and IDs to make interpretation easier after RDA
-bcftools query -f '%CHROM\t%POS\t%END\t%ID\n' $RAW_FST_VCF > $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table
+# 1. Extract POP and ID from ID_SEX_POP
+#cut -f1,3 $ID_SEX_POP > 02_infos/ID_POP.txt
 
+# 2. Run Fisher tests
+Rscript 01_scripts/utils/fisher_test.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 02_infos/ID_POP.txt $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $POP1 $POP2 $MAX_QVAL $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"
 
-# 2. Convert VCF to genotype matrix
-vcftools --gzvcf $ANGSD_FST_VCF --012 --out $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat
+# 3. Get overlap of outlier sites with known genes
+tail -n+2 $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".txt > $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".table
 
-# 3. Impute missing data
-Rscript 01_scripts/utils/impute_missing.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $ID_SEX_POP
-echo "imputation done"
-
-# 4. Run RDA
-Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $RDA_DIR
-
-# 5. Get overlap of outlier sites with known genes
-tail -n+2 $RDA_DIR/RDA_outliers.txt > $RDA_DIR/indels_RDA_outliers.table
-bedtools window -a $ANNOT_TABLE -b $RDA_DIR/indels_RDA_outliers.table -w $OVERLAP_WIN > $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp.table
+bedtools window -a $ANNOT_TABLE -b $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".table -w $OVERLAP_WIN > $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL"_overlap"$OVERLAP_WIN"bp.table
