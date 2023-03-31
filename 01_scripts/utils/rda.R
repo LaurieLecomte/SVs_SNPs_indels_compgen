@@ -9,7 +9,7 @@ library(ggplot2)
 argv <- commandArgs(T)
 FILE <- argv[1] # "$MAT_file"
 ID_SEX_POP <- argv[2]
-CHR_POS_ID <- argv[3]
+CHR_POS_ID_END <- argv[3]
 OUT_DIR <- argv[4]
 
 GEN_MAT_PATH <- paste0(FILE, ".imp")
@@ -63,25 +63,7 @@ write.table(RsquareAdj(pop.rda), paste0(OUT_DIR, "/adjR2_pop.txt"), row.names = 
 #dev.off()
 
 
-# 3. Check RDA signifiance using ANOVA ------------------------------------
-print('checking sgnifiance using ANOVA')
-
-#signif.full <- anova.cca(pop.rda, parallel = getOption("mc.cores")) # default is permutation=999
-#signif.full <- anova.cca(pop.rda, parallel = CORES)
-signif.full <- anova.cca(pop.rda)
-signif.full
-saveRDS(signif.full, file = paste0(OUT_DIR, '/signif.full_pop.rds'))
-
-#signif.axis <- anova.cca(pop.rda, by = "axis", parallel = getOption("mc.cores"))
-#signif.axis <- anova.cca(pop.rda, by = "axis", parallel = CORES)
-signif.axis <- anova.cca(pop.rda, by = "axis")
-signif.axis
-saveRDS(signif.axis, file = paste0(OUT_DIR, '/signif.axis_pop.rds'))
-
-
-
-
-# 4. Identify candidate sites ---------------------------------------------
+# 3. Identify candidate sites ---------------------------------------------
 
 # Extract loadings
 load.rda <- summary(pop.rda)$species[, 1:3]
@@ -108,18 +90,18 @@ outliers <- function(x, z){
 ## 3 sd is standard, 2 sd is less conservative
 cand1 <- outliers(load.rda[, 1], 3) # candidates SNPs for RDA1
 cand2 <- outliers(load.rda[, 2], 3) # candidates SNPs for RDA2
-##cand3 <- outliers(load.rda[, 3], 3) 
+cand3 <- outliers(load.rda[, 3], 3) 
 
 ## Get number of candidate outlier SNPs
-ncand <- length(cand1) + length(cand2) #+ length(cand3)
+ncand <- length(cand1) + length(cand2) + length(cand3)
 cat(paste('number of candidate outlier sites : ', ncand, "\n"))
 
 lim <- 3
 if (ncand == 0){
   cand1 <- outliers(load.rda[, 1], 2.5) 
   cand2 <- outliers(load.rda[, 2], 2.5) 
-  #cand3 <- outliers(load.rda[, 3], 2) 
-  ncand<-length(cand1) + length (cand2) #+ length ( cand3) # total nb of snps
+  cand3 <- outliers(load.rda[, 3], 2.5) 
+  ncand<-length(cand1) + length (cand2) + length ( cand3) # total nb of snps
   lim <- 2.5
   print("no outlier site with 3 sd, outlier detection re-done with 2.5 sd")
 }
@@ -128,31 +110,30 @@ if (ncand == 0){
 ### For each axis/RDA
 cand1 <- cbind.data.frame(axis = rep(1, times = length(cand1)), snp = names(cand1), loading = unname(cand1))
 cand2 <- cbind.data.frame(axis = rep(2, times = length(cand2)), snp = names(cand2), loading = unname(cand2))
+cand3 <- cbind.data.frame(axis = rep(3, times = length(cand3)), snp = names(cand3), loading = unname(cand3))
 #cand3 <- cbind.data.frame(rep(3,times = length(cand3)), names(cand3), unname(cand3))
 #colnames(cand1) <- colnames(cand2) <- colnames(cand3) <- c("axis", "snp", "loading")
 
 ## Bind all together
-cand <- rbind(cand1, cand2)#, cand3)
+cand <- rbind(cand1, cand2, cand3)
 cand$snp <- as.character(cand$snp)
 cand$CHROM <- sapply(X = cand$snp, FUN = function(x) unlist(strsplit(x, split = '_'))[1])
 cand$POS <- sapply(X = cand$snp, FUN = function(x) as.numeric(unlist(strsplit(x, split = '_'))[2]))
-cand$END <- cand$POS + 1
+#cand$END <- cand$POS + 1
 
 ## Add variant ID (relevant for SVs only)
-chr_pos_ID <- read.table(CHR_POS_ID, header = FALSE, col.names = c('CHROM', 'POS', 'ID'))
+chr_pos_ID_end <- read.table(CHR_POS_ID_END, header = FALSE, col.names = c('CHROM', 'POS', 'ID', 'END'))
 
-cand <- merge(cand, chr_pos_ID, by = c('CHROM', 'POS'))
+cand <- merge(cand, chr_pos_ID_end, by = c('CHROM', 'POS'))
 
-write.table(cand[, c('CHROM', 'POS', 'ID', 'loading')], file = paste0(OUT_DIR, '/RDA_outliers.txt'), sep = "\t", quote = FALSE, row.names = FALSE)
+write.table(cand[, c('CHROM', 'POS', 'END', 'ID', 'loading')], file = paste0(OUT_DIR, '/RDA_outliers.txt'), sep = "\t", quote = FALSE, row.names = FALSE)
 
 ## Check for duplicates
 length(cand$snp[duplicated(cand$snp)])
 cand <- cand[!duplicated(cand$snp), ]
 
 
-
-
-# 5. Plot RDA outlier sites -----------------------------------------------
+# 4. Plot RDA outlier sites -----------------------------------------------
 
 # sites at middle (red), samples are black, vectors are predictors
 print('plotting')
@@ -173,7 +154,8 @@ all_sites$site <- row.names(load.rda)
 all_sites$CHROM <- sapply(X = all_sites$site, FUN = function(x) unlist(strsplit(x, split = '_'))[1])
 all_sites$POS <- sapply(X = all_sites$site, FUN = function(x) as.numeric(unlist(strsplit(x, split = '_'))[2]))
 
-write.table(all_sites[, c('CHROM', 'POS', 'RDA1', 'PC1')], file = paste0(OUT_DIR, '/RDA_all_sites.txt'), sep = "\t", quote = FALSE, row.names = FALSE)
+all_sites <- merge(all_sites, chr_pos_ID_end, by = c('CHROM', 'POS'))
+write.table(all_sites[, c('CHROM', 'POS', 'END', 'ID', 'RDA1', 'PC1')], file = paste0(OUT_DIR, '/RDA_all_sites.txt'), sep = "\t", quote = FALSE, row.names = FALSE)
 
 
 all_sites_RDA1 <- 
@@ -199,14 +181,34 @@ ggplot(data = all_sites) +
 
 jpeg(file = paste0(OUT_DIR, "/plot_RDA1.jpg"))
 all_sites_RDA1
+
 saveRDS(all_sites_RDA1, file = paste0(OUT_DIR, "/plot_RDA1.rds"))
 dev.off()
 
 jpeg(file = paste0(OUT_DIR, "/plot_RDA1_outliers.jpg"))
+
 all_sites_RDA1_outliers <- all_sites_RDA1 + 
   geom_point(data = cand, aes(x = POS, y = abs(loading)), col = 'red', size = 0.5) 
+all_sites_RDA1_outliers
+
 saveRDS(all_sites_RDA1_outliers, file = paste0(OUT_DIR, "/plot_RDA1_outliers.rds"))
 dev.off()
+
+# 5. Check RDA signifiance using ANOVA ------------------------------------
+print('checking sgnifiance using ANOVA')
+
+signif.full <- anova.cca(pop.rda, parallel = getOption("mc.cores")) # default is permutation=999
+#signif.full <- anova.cca(pop.rda, parallel = CORES)
+#signif.full <- anova.cca(pop.rda)
+signif.full
+saveRDS(signif.full, file = paste0(OUT_DIR, '/signif.full_pop.rds'))
+
+signif.axis <- anova.cca(pop.rda, by = "axis", parallel = getOption("mc.cores"))
+#signif.axis <- anova.cca(pop.rda, by = "axis", parallel = CORES)
+#signif.axis <- anova.cca(pop.rda, by = "axis")
+signif.axis
+saveRDS(signif.axis, file = paste0(OUT_DIR, '/signif.axis_pop.rds'))
+
 
 
 # 6. Add correlation with each predictor ----------------------------------
