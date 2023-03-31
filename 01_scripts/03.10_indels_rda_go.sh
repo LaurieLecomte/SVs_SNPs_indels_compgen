@@ -3,6 +3,7 @@
 # Perform GO enrichment analysis on outliers indels genes identified by RDA
 # First get overlap between genotyped indels and known genes and between outlier indels, while allowing a 10000 bp window around genes
 # Specify window size at positional arg 1
+# Launch in a conda env where goatools is installed
 
 # Works on ONE population pair at the time, so variables ANGSD_FST_VCF, RAW_FST_VCF and POP_PAIR must be adjusted accordingly - I only have 2 populations (RO and PU), so VCF names will be written as is
 
@@ -72,4 +73,10 @@ python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
   $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt \
   $GO_ANNOT --min_overlap 0.1 \
   --outfile $GO_DIR/indels_"$POP1"_"$POP2"_RDAoutliers_overlap"$OVERLAP_WIN"bp_GO.csv
+  
+# 4. Filter results
+MAX_FDR=0.1
+MIN_LEVEL=1
+
+Rscript 01_scripts/utils/filter_GO.R $GO_DIR/indels_"$POP1"_"$POP2"_RDAoutliers_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
   
