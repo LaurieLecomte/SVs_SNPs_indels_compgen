@@ -72,11 +72,11 @@ python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
   $GO_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp_outlierIDs.txt \
   $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt \
   $GO_ANNOT --min_overlap 0.1 \
-  --outfile $GO_DIR/indels_"$POP1"_"$POP2"_RDAoutliers_overlap"$OVERLAP_WIN"bp_GO.csv
+  --outfile $GO_DIR/indels_"$POP1"_"$POP2"_RDA_outliers_overlap"$OVERLAP_WIN"bp_GO.csv
   
 # 4. Filter results
 MAX_FDR=0.1
 MIN_LEVEL=1
 
-Rscript 01_scripts/utils/filter_GO.R $GO_DIR/indels_"$POP1"_"$POP2"_RDAoutliers_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
+Rscript 01_scripts/utils/filter_GO.R $GO_DIR/indels_"$POP1"_"$POP2"_RDA_outliers_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
   
