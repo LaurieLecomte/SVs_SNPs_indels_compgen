@@ -55,7 +55,7 @@ OVERLAP_WIN=$1
 module load vcftools/0.1.16
 module load bcftools/1.13
 module load R/4.1
-
+module load bedtools/2.30.0
 
 # 1. Produce a list of indel sites and IDs to make interpretation easier after RDA
 bcftools query -f '%CHROM\t%POS\t%END\t%ID\n' $RAW_FST_VCF > $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table

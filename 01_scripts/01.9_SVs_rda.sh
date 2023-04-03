@@ -66,7 +66,7 @@ Rscript 01_scripts/utils/impute_missing.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD
 echo "imputation done"
 
 # 4. Run RDA
-Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $RDA_DIR
+Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $RDA_DIR
 
 # 5. Get overlap of outlier sites with known genes
 tail -n+2 $RDA_DIR/RDA_outliers.txt > $RDA_DIR/SV_RDA_outliers.table
