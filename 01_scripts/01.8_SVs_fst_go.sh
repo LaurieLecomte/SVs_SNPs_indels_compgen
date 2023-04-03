@@ -76,4 +76,9 @@ python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
 #  03_genome/all_genes.ids \
 #  $GO_ANNOT --min_overlap 0.1 \
 #  --outfile $GO_DIR/outlier_SVs_fixed"$FIXED_FST"/outlier_SVs_fixed"$FIXED_FST"_win"$DIST"_vs_ALLgenes.csv
-  
+
+# 4. Filter results
+MAX_FDR=0.1
+MIN_LEVEL=1
+
+Rscript 01_scripts/utils/filter_GO.R $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
