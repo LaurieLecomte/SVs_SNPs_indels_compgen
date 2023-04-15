@@ -38,7 +38,9 @@ MAX_MAF=0.95
 
 CHR_LIST="02_infos/chr_list.txt"
 
-SV_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.gz"
+#SV_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.gz"
+SV_BEAGLE="$ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".norm.beagle.gz"
+
 COV_MAT="$PCA_DIR/"$(basename -s .norm.beagle.gz $SV_BEAGLE)""
 
 

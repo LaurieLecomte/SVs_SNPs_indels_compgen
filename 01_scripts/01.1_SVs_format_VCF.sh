@@ -49,5 +49,5 @@ bcftools sort $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.tmp 
 tabix -p vcf $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.vcf.gz
 
 # Clean up 
-#rm $RAW_VCF_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_PL.vcf
-#rm $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.tmp
+rm $RAW_VCF_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_PL.vcf
+rm $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.tmp

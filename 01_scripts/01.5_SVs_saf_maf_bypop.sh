@@ -33,12 +33,13 @@ N_IND="$(less $ID_SEX_POP | wc -l)"
 
 CPU=4
 
-MIN_MAF=0.05
-MAX_MAF=0.95
+#MIN_MAF=0.05
+#MAX_MAF=0.95
 
 POPS_FILE="02_infos/pops.txt"
 
-FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
+#FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
+#FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".vcf.gz"
 
 REALSFS_PATH="/prg/angsd/0.937/misc/realSFS"
 
@@ -61,13 +62,13 @@ do
 	echo "working on pop $POP, $N_IND individuals, will use the sites file provided"
 	
 	# Filter vcf
-	bcftools view -S 02_infos/"$POP"_IDs.txt $FILT_ANGSD_VCF --threads $CPU | bcftools sort -Oz > $ANGSD_BYPOP_DIR/$(basename -s .vcf.gz $FILT_ANGSD_VCF)_"$POP".vcf.gz
-	tabix -p vcf $ANGSD_BYPOP_DIR/$(basename -s .vcf.gz $FILT_ANGSD_VCF)_"$POP".vcf.gz -f
+	bcftools view -S 02_infos/"$POP"_IDs.txt $SV_VCF_ANGSD --threads $CPU | bcftools sort -Oz > $ANGSD_BYPOP_DIR/$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)_"$POP".vcf.gz
+	tabix -p vcf $ANGSD_BYPOP_DIR/$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)_"$POP".vcf.gz -f
 	
-	echo "Calculate the SAF, MAF for $N_IND in vcf $FILT_ANGSD_VCF"
+	echo "Calculate the SAF, MAF for $N_IND in vcf $SV_VCF_ANGSD"
 	
 	# Compute saf and maf
-	angsd -vcf-pl $ANGSD_BYPOP_DIR/$(basename -s .vcf.gz $FILT_ANGSD_VCF)_"$POP".vcf.gz  \
+	angsd -vcf-pl $ANGSD_BYPOP_DIR/$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)_"$POP".vcf.gz  \
 	-nind $N_IND -anc $GENOME -fai "$GENOME".fai \
 	-dosaf 1 -domaf 1 -doMajorMinor 5 \
 	-out $ANGSD_BYPOP_DIR/"$POP"

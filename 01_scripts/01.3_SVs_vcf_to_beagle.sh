@@ -51,12 +51,14 @@ module load R/4.1
 less $CHR_LIST | while read CHR
 do 
   echo "convert vcf to beagle for $CHR"
-  vcftools --gzvcf $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz --BEAGLE-PL --chr $CHR --out $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF"_$CHR
+  #vcftools --gzvcf $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz --BEAGLE-PL --chr $CHR --out $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF"_$CHR
+  vcftools --gzvcf $SV_VCF_ANGSD --BEAGLE-PL --chr $CHR --out $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_"$CHR"
 done
 
 ## Extract header from 1st chromosome beagle
 FIRST_CHR="$(head -n1 $CHR_LIST)"
-head -n 1 $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF"_"$FIRST_CHR".BEAGLE.PL > $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".beagle
+#head -n 1 $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF"_"$FIRST_CHR".BEAGLE.PL > $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".beagle
+head -n 1 $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_"$FIRST_CHR".BEAGLE.PL > $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".beagle
 
 ## make a new file with the header
 #cp "$VCF_ANGSD".beagleheader "$VCF_ANGSD".beagle
@@ -65,24 +67,35 @@ head -n 1 $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$M
 less $CHR_LIST | while read CHR
 do 
   echo "append beagle from $CHR"
-  tail -n +2 $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF"_"$CHR".BEAGLE.PL >> $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".beagle
+  #tail -n +2 $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF"_"$CHR".BEAGLE.PL >> $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".beagle
+  tail -n +2 $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_"$CHR".BEAGLE.PL >> $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".beagle
 done
 
 ## confirm SV count in beagle is = to number of SV in input VCF
-wc -l $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".beagle
+#wc -l $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".beagle
+wc -l $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".beagle
+
 
 # 2. Normalize likelihoods in beagle file
-Rscript 01_scripts/utils/normalize_beagle.R $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".beagle $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents
+#Rscript 01_scripts/utils/normalize_beagle.R $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".beagle $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents
+Rscript 01_scripts/utils/normalize_beagle.R $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".beagle $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".norm.beagle.contents
+
 
 ## add header
-head -n 1 $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF"_"$FIRST_CHR".BEAGLE.PL > $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle
+#head -n 1 $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF"_"$FIRST_CHR".BEAGLE.PL > $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle
+head -n 1 $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)"_"$FIRST_CHR".BEAGLE.PL > $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".norm.beagle
 
-less $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents >> $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle
+#less $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents >> $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle
+less $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".norm.beagle.contents >> $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".norm.beagle
 
 # 3. Compress 
-gzip $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle
+#gzip $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle
+gzip $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".norm.beagle
 
 # Clean up
-for file in $(ls -1 $ANGSD_STATS_DIR/*.BEAGLE.PL); do rm $file; done
-for file in $(ls -1 $ANGSD_STATS_DIR/*.log); do rm $file; done
-rm $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents
+#for file in $(ls -1 $ANGSD_STATS_DIR/*.BEAGLE.PL); do rm $file; done
+for file in $(ls -1 $ANGSD_INPUT_DIR/*.BEAGLE.PL); do rm $file; done
+#for file in $(ls -1 $ANGSD_STATS_DIR/*.log); do rm $file; done
+for file in $(ls -1 $ANGSD_INPUT_DIR/*.log); do rm $file; done
+#rm $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents
+rm $ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".norm.beagle.contents

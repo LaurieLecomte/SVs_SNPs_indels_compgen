@@ -34,16 +34,16 @@ SV_VCF_ANGSD="$ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.vcf.
 
 N_IND="$(less $ID_SEX_POP | wc -l)"
 
-MIN_MAF=0.05
-MAX_MAF=0.95
+#MIN_MAF=0.05
+#MAX_MAF=0.95
 
-FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
-
+#FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
+#FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".vcf.gz"
 
 POP1='RO'
 POP2='PU'
 
-ANGSD_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".SVsFst_"$POP1"_"$POP2".vcf.gz" # VCF formatted for angsd, with added Fst values from previous script
+ANGSD_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".SVsFst_"$POP1"_"$POP2".vcf.gz" # VCF formatted for angsd, with added Fst values from previous script
 RAW_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".SVsFst_"$POP1"_"$POP2".vcf.gz" # input VCF (NOT the one formatted for angsd), with added Fst values from previous script
 
 OVERLAP_WIN=$1
@@ -58,17 +58,20 @@ module load bedtools/2.30.0
 module load bcftools/1.13
 
 # 1. Extract CHROM, POS, END and FST from final ANGSD VCF
-bcftools query -f "%CHROM\t%POS\t%END\t%ID\t%FST_"$POP1"_"$POP2"\n" $ANGSD_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table
-
+#bcftools query -f "%CHROM\t%POS\t%END\t%ID\t%FST_"$POP1"_"$POP2"\n" $ANGSD_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table
+bcftools query -f "%CHROM\t%POS\t%END\t%ID\t%FST_"$POP1"_"$POP2"\n" $RAW_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table
 
 # 2. Find overlap between ALL genotyped SVs and known genes = get number of unique genes near SVs
-bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table -w $OVERLAP_WIN > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSVs.table
+#bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table -w $OVERLAP_WIN > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSVs.table
+bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table -w $OVERLAP_WIN > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSVs.table
 
-echo "$(less $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSVs.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of a filtered genotyped SV"
+#echo "$(less $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSVs.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of a filtered genotyped SV"
+echo "$(less $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSVs.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of a filtered genotyped SV"
 
 # 3. Find overlap between OUTLIER SVs and known genes
 ## Find outlier SVs with Fst > MIN_FST
-less $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table | awk -v val="$MIN_FST" 'BEGIN{FS="\t"} $5 >= val {print}' > $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST".table
+#less $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table | awk -v val="$MIN_FST" 'BEGIN{FS="\t"} $5 >= val {print}' > $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST".table
+less $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table | awk -v val="$MIN_FST" 'BEGIN{FS="\t"} $5 >= val {print}' > $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST".table
 echo "$(less $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST".table | wc -l) outlier SVs with Fst >= $MIN_FST"
 
 ## Get overlap 
