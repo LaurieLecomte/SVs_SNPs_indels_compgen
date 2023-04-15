@@ -34,17 +34,17 @@ N_IND="$(less $ID_SEX_POP | wc -l)"
 
 CPU=2
 
-MIN_MAF=0.05
-MAX_MAF=0.95
+#MIN_MAF=0.05
+#MAX_MAF=0.95
 
 POPS_FILE="02_infos/pops.txt"
 
-FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
+#FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
 
 POP1='RO'
 POP2='PU'
 
-ANGSD_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".SNPsFst_"$POP1"_"$POP2".vcf.gz" # VCF formatted for angsd, with added Fst values from previous script
+#ANGSD_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".SNPsFst_"$POP1"_"$POP2".vcf.gz" # VCF formatted for angsd, with added Fst values from previous script
 RAW_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_SNPS_VCF)".SNPsFst_"$POP1"_"$POP2".vcf.gz" # input VCF, with added Fst values from previous script
 
 GENOME_ANNOT="03_genome/annotation/genome_annotation_table_simplified_1.5.tsv"
@@ -66,7 +66,8 @@ module load R/4.1
 #cut -f1,3 $ID_SEX_POP > 02_infos/ID_POP.txt
 
 # 2. Run Fisher tests
-Rscript 01_scripts/utils/fisher_test.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 02_infos/ID_POP.txt $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $POP1 $POP2 $MAX_QVAL $FISHER_DIR/SNPs_fisher_"$POP1"_"$POP2"
+#Rscript 01_scripts/utils/fisher_test.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 02_infos/ID_POP.txt $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $POP1 $POP2 $MAX_QVAL $FISHER_DIR/SNPs_fisher_"$POP1"_"$POP2"
+Rscript 01_scripts/utils/fisher_test.R $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".geno_mat.012 02_infos/ID_POP.txt $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $POP1 $POP2 $MAX_QVAL $FISHER_DIR/SNPs_fisher_"$POP1"_"$POP2"
 
 # 3. Get overlap of outlier sites with known genes
 tail -n+2 $FISHER_DIR/SNPs_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".txt > $FISHER_DIR/SNPs_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".table

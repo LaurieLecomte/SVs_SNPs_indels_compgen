@@ -38,7 +38,8 @@ MAX_MAF=0.95
 
 CHR_LIST="02_infos/chr_list.txt"
 
-SNPS_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.gz"
+#SNPS_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.gz"
+SNPS_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".norm.beagle.gz"
 COV_MAT="$PCA_DIR/"$(basename -s .norm.beagle.gz $SNPS_BEAGLE)""
 
 # LOAD REQUIRED MODULES

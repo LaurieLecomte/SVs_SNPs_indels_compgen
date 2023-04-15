@@ -37,12 +37,12 @@ N_IND="$(less $ID_SEX_POP | wc -l)"
 
 CPU=2
 
-MIN_MAF=0.05
-MAX_MAF=0.95
+#MIN_MAF=0.05
+#MAX_MAF=0.95
 
 POPS_FILE="02_infos/pops.txt"
 
-FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
+#FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
 
 POP1='RO'
 POP2='PU'
