@@ -33,12 +33,12 @@ N_IND="$(less $ID_SEX_POP | wc -l)"
 
 CPU=4
 
-MIN_MAF=0.05
-MAX_MAF=0.95
+#MIN_MAF=0.05
+#MAX_MAF=0.95
 
 POPS_FILE="02_infos/pops.txt"
 
-FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
+#FILT_ANGSD_VCF="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz"
 
 REALSFS_PATH="/prg/angsd/0.937/misc/realSFS"
 
@@ -124,10 +124,14 @@ do
    
    ## Annotate 
    #-a is the annotation file (tabix and bgzip, it needs at least CHROM and POS, -h are the header lines to add, -c are the meaning of the column in the annotation file
-   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $FILT_ANGSD_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".indelsFst_"$pop1"_"$pop2".vcf.gz"
-   tabix -p vcf "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".indelsFst_"$pop1"_"$pop2".vcf.gz" -f 
+   #bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $FILT_ANGSD_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".indelsFst_"$pop1"_"$pop2".vcf.gz"
+   #tabix -p vcf "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".indelsFst_"$pop1"_"$pop2".vcf.gz" -f 
+   bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $INDELS_VCF_ANGSD -Oz --threads $CPU > "$ANGSD_FST_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".indelsFst_"$pop1"_"$pop2".vcf.gz"
+   tabix -p vcf "$ANGSD_FST_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".indelsFst_"$pop1"_"$pop2".vcf.gz" -f 
    
    # 6. Add per site Fst to the input VCF that has NOT been formatted for angsd
+   #bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $RAW_INDELS_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_INDELS_VCF)".indelsFst_"$pop1"_"$pop2".vcf.gz"
+   #tabix -p vcf "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_INDELS_VCF)".indelsFst_"$pop1"_"$pop2".vcf.gz" -f 
    bcftools annotate -a $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz -h $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr -c CHROM,POS,INFO/FST_"$pop1"_"$pop2" $RAW_INDELS_VCF -Oz --threads $CPU > "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_INDELS_VCF)".indelsFst_"$pop1"_"$pop2".vcf.gz"
    tabix -p vcf "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_INDELS_VCF)".indelsFst_"$pop1"_"$pop2".vcf.gz" -f 
    

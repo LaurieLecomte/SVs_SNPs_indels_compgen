@@ -33,12 +33,13 @@ N_IND="$(less $ID_SEX_POP | wc -l)"
 
 CPU=4
 
-MIN_MAF=0.05
-MAX_MAF=0.95
+#MIN_MAF=0.05
+#MAX_MAF=0.95
 
 CHR_LIST="02_infos/chr_list.txt"
 
-INDELS_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.gz"
+#INDELS_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.gz"
+INDELS_BEAGLE="$ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".norm.beagle.gz"
 COV_MAT="$PCA_DIR/"$(basename -s .norm.beagle.gz $INDELS_BEAGLE)""
 
 
