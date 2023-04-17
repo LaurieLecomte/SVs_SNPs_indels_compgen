@@ -139,8 +139,8 @@ do
    rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.hdr
    rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz
    rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.gz.tbi
-   rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.end
-   rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.tmp
+   #rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.end
+   #rm $ANGSD_FST_DIR/$GROUP/"$pop1"_"$pop2".bypos.sfs.annot.tmp
    
    done;
    

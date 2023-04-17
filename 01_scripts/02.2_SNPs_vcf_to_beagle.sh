@@ -91,6 +91,6 @@ gzip $ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".norm.beagle -f
 #for file in $(ls -1 $ANGSD_STATS_DIR/*.BEAGLE.PL); do rm $file; done
 # for file in $(ls -1 $ANGSD_INPUT_DIR/*.BEAGLE.PL); do rm $file; done
 #for file in $(ls -1 $ANGSD_STATS_DIR/*.log); do rm $file; done
-for file in $(ls -1 $ANGSD_INPUT_DIR/*.log); do rm $file; done
+#for file in $(ls -1 $ANGSD_INPUT_DIR/*.log); do rm $file; done
 #rm $ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents
 #for file in $(ls -1 $ANGSD_INPUT_DIR/*.BEAGLE.PL); do rm $file; done
