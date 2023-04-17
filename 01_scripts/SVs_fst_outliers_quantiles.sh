@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Get overlap between genotyped SVs and known genes and between outlier SVs (with Fst > 0.4), while allowing a 10000 bp window around genes
-# Specify window size at positional arg 1, and min Fst threshold at positional arg 2
+# Extract outlier SVs by computing quantiles, and get overlap between these outlier and known genes, while allowing a 10000 bp window around genes
+# Specify window size at positional arg 1, and quantile threshold at positional arg 2
 
 # Works on ONE population pair at the time, so variables ANGSD_FST_VCF, RAW_FST_VCF and POP_PAIR must be adjusted accordingly - I only have 2 populations (RO and PU), so VCF names will be written as is
 
