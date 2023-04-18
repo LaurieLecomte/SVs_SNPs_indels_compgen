@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Perform RDA on SVs with population as the only explanatory variable and check overlap with known genes
-# Specify window size at positional arg 1
+# Specify window size at positional arg 1 and number of sd at arg 2
 
 # manitou
-# srun -p small -c 1 -J 01.9_SVs_rda -o log/01.9_SVs_rda_%j.log /bin/sh 01_scripts/01.9_SVs_rda.sh 10000 &
+# srun -p small -c 1 -J 01.9_SVs_rda -o log/01.9_SVs_rda_%j.log /bin/sh 01_scripts/01.9_SVs_rda.sh 10000 3 &
 
 # valeria
-# srun -p ibis_small -c 1 -J 01.9_SVs_rda -o log/01.9_SVs_rda_%j.log /bin/sh 01_scripts/01.9_SVs_rda.sh 10000 &
+# srun -p ibis_small -c 1 -J 01.9_SVs_rda -o log/01.9_SVs_rda_%j.log /bin/sh 01_scripts/01.9_SVs_rda.sh 10000 3 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -47,6 +47,7 @@ GENOME_ANNOT="03_genome/annotation/genome_annotation_table_simplified_1.5.tsv"
 ANNOT_TABLE="03_genome/annotation/"$(basename -s .tsv $GENOME_ANNOT)".table"
 
 OVERLAP_WIN=$1
+SD=
 
 # LOAD REQUIRED MODULES
 module load vcftools/0.1.16
@@ -67,14 +68,14 @@ Rscript 01_scripts/utils/impute_missing.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD
 echo "imputation done"
 
 # 4. Run RDA
-Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $RDA_DIR
+Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $SD $RDA_DIR
 
 # 5. Get overlap of outlier sites with known genes
-tail -n+2 $RDA_DIR/RDA_outliers.txt > $RDA_DIR/SV_RDA_outliers.table
-echo "$(less $RDA_DIR/SV_RDA_outliers.table | wc -l) outlier SVs"
+tail -n+2 $RDA_DIR/RDA_"$SD"sd_outliers.txt > $RDA_DIR/RDA_"$SD"sd_outliers.table
+echo "$(less $RDA_DIR/RDA_"$SD"sd_outliers.table | wc -l) outlier SVs"
 
-bedtools window -a $ANNOT_TABLE -b $RDA_DIR/SV_RDA_outliers.table -w $OVERLAP_WIN > $RDA_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp.table
+bedtools window -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers.table -w $OVERLAP_WIN > $RDA_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table
 
-echo "$(less $RDA_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier SV"
+echo "$(less $RDA_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier SV"
 
 

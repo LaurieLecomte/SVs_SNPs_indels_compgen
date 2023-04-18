@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Perform RDA on SNPs with population as the only explanatory variable
-# Specify window size at positional arg 1
+# Specify window size at positional arg 1 and number of sd at arg 2
 
 # manitou
 # srun -p medium --time=7-00:00:00 -c 2 --mem=50G -J 02.8_SNPs_rda -o log/02.8_SNPs_rda_%j.log /bin/sh 01_scripts/02.8_SNPs_rda.sh 10000 &
@@ -50,6 +50,7 @@ GENOME_ANNOT="03_genome/annotation/genome_annotation_table_simplified_1.5.tsv"
 ANNOT_TABLE="03_genome/annotation/"$(basename -s .tsv $GENOME_ANNOT)".table"
 
 OVERLAP_WIN=$1
+SD=$2
 
 # LOAD REQUIRED MODULES
 module load vcftools/0.1.16
@@ -72,9 +73,9 @@ Rscript 01_scripts/utils/impute_missing.R $RDA_DIR/"$(basename -s .vcf.gz $RAW_F
 Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $RDA_DIR
 
 # 5. Get overlap of outlier sites with known genes
-tail -n+2 $RDA_DIR/RDA_outliers.txt > $RDA_DIR/SNPs_RDA_outliers.table
-echo "$(less $RDA_DIR/SNPs_RDA_outliers.table | wc -l) outlier SNPs"
+tail -n+2 $RDA_DIR/RDA_"$SD"sd_outliers.txt > $RDA_DIR/RDA_"$SD"sd_outliers.table
+echo "$(less $RDA_DIR/RDA_"$SD"sd_outliers.table | wc -l) outlier SNPs"
 
-bedtools window -a $ANNOT_TABLE -b $RDA_DIR/SNPs_RDA_outliers.table -w $OVERLAP_WIN > $RDA_DIR/SNPs_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp.table
+bedtools window -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers.table -w $OVERLAP_WIN > $RDA_DIR/SNPs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table
 
-echo "$(less $RDA_DIR/SNPs_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier SNP"
+echo "$(less $RDA_DIR/SNPs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier SNP"

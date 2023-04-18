@@ -2,7 +2,7 @@
 
 # Perform GO enrichment analysis on outliers indels genes identified by RDA
 # First get overlap between genotyped indels and known genes and between outlier indels, while allowing a 10000 bp window around genes
-# Specify window size at positional arg 1
+# Specify window size at positional arg 1 and number of sd at arg 2
 # Launch in a conda env where goatools is installed
 
 # Works on ONE population pair at the time, so variables ANGSD_FST_VCF, RAW_FST_VCF and POP_PAIR must be adjusted accordingly - I only have 2 populations (RO and PU), so VCF names will be written as is
@@ -55,6 +55,7 @@ GENOME_ANNOT="03_genome/annotation/genome_annotation_table_simplified_1.5.tsv"
 ANNOT_TABLE="03_genome/annotation/"$(basename -s .tsv $GENOME_ANNOT)".table"
 
 OVERLAP_WIN=$1
+SD=$2
 
 GO_DB="12_go/go_db/go-basic.obo"
 GO_ANNOT="12_go/go_db/all_go_annotations.csv"
@@ -64,19 +65,19 @@ GO_ANNOT="12_go/go_db/all_go_annotations.csv"
 less $ANNOT_TABLE | cut -f5 | sort | uniq > $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt
 
 # 2. Extract gene IDs from outlier indels table from script 03.9 = OUTLIER IDs
-less $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp.table | cut -f5 | sort | uniq > $GO_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp_outlierIDs.txt
+less $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table | cut -f5 | sort | uniq > $GO_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp_outlierIDs.txt
 
 # 3. Run GO enrichment
 python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
   --obo $GO_DB \
-  $GO_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp_outlierIDs.txt \
+  $GO_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp_outlierIDs.txt \
   $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt \
   $GO_ANNOT --min_overlap 0.1 \
-  --outfile $GO_DIR/indels_"$POP1"_"$POP2"_RDA_outliers_overlap"$OVERLAP_WIN"bp_GO.csv
+  --outfile $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.csv
   
 # 4. Filter results
 MAX_FDR=0.1
 MIN_LEVEL=1
 
-Rscript 01_scripts/utils/filter_GO.R $GO_DIR/indels_"$POP1"_"$POP2"_RDA_outliers_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
+Rscript 01_scripts/utils/filter_GO.R $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
   

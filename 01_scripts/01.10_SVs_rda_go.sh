@@ -2,16 +2,16 @@
 
 # Perform GO enrichment analysis on outliers SVs genes identified by RDA
 # First get overlap between genotyped SVs and known genes and between outlier SVs, while allowing a 10000 bp window around genes
-# Specify window size at positional arg 1
+# Specify window size at positional arg 1 and number of sd at arg 2
 # Launch in a conda env where goatools is installed
 
 # Works on ONE population pair at the time, so variables ANGSD_FST_VCF, RAW_FST_VCF and POP_PAIR must be adjusted accordingly - I only have 2 populations (RO and PU), so VCF names will be written as is
 
 # manitou
-# srun -p small -c 1 -J 01.10_SVs_rda_go -o log/01.10_SVs_rda_go_%j.log /bin/sh 01_scripts/01.10_SVs_rda_go.sh 10000 &
+# srun -p small -c 1 -J 01.10_SVs_rda_go -o log/01.10_SVs_rda_go_%j.log /bin/sh 01_scripts/01.10_SVs_rda_go.sh 10000 3 &
 
 # valeria
-# srun -p ibis_small -c 1 -J 01.10_SVs_rda_go -o log/01.10_SVs_rda_go_%j.log /bin/sh 01_scripts/01.10_SVs_rda_go.sh 10000 &
+# srun -p ibis_small -c 1 -J 01.10_SVs_rda_go -o log/01.10_SVs_rda_go_%j.log /bin/sh 01_scripts/01.10_SVs_rda_go.sh 10000 3 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -48,6 +48,7 @@ ANGSD_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".SVs
 RAW_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".SVsFst_"$POP1"_"$POP2".vcf.gz" # input VCF (NOT the one formatted for angsd), with added Fst values from previous script
 
 OVERLAP_WIN=$1
+SD=$2
 
 GENOME_ANNOT="03_genome/annotation/genome_annotation_table_simplified_1.5.tsv"
 ANNOT_TABLE="03_genome/annotation/"$(basename -s .tsv $GENOME_ANNOT)".table"
@@ -64,18 +65,18 @@ GO_ANNOT="12_go/go_db/all_go_annotations.csv"
 less $ANNOT_TABLE | cut -f5 | sort | uniq > $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt
 
 # 2. Extract gene IDs from outlier SVs table from script 01.9 = OUTLIER IDs
-less $RDA_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp.table | cut -f5 | sort | uniq > $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp_outlierIDs.txt
+less $RDA_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table | cut -f5 | sort | uniq > $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp_outlierIDs.txt
 
 # 3. Run GO enrichment
 python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
   --obo $GO_DB \
-  $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp_outlierIDs.txt \
+  $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp_outlierIDs.txt \
   $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt \
   $GO_ANNOT --min_overlap 0.1 \
-  --outfile $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_outliers_overlap"$OVERLAP_WIN"bp_GO.csv
+  --outfile $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.csv
   
 # 4. Filter results
 MAX_FDR=0.1
 MIN_LEVEL=1
 
-Rscript 01_scripts/utils/filter_GO.R $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_outliers_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
+Rscript 01_scripts/utils/filter_GO.R $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL

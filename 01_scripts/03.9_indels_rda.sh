@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Perform RDA on indels with population as the only explanatory variable
-# Specify window size at positional arg 1
+# Specify window size at positional arg 1 and number of sd at arg 2
 
 # manitou
 # srun -p small -c 2 --mem=30G -J 03.9_indels_rda -o log/03.9_indels_rda_%j.log /bin/sh 01_scripts/03.9_indels_rda.sh 10000 &
@@ -50,6 +50,7 @@ GENOME_ANNOT="03_genome/annotation/genome_annotation_table_simplified_1.5.tsv"
 ANNOT_TABLE="03_genome/annotation/"$(basename -s .tsv $GENOME_ANNOT)".table"
 
 OVERLAP_WIN=$1
+SD=$2
 
 # LOAD REQUIRED MODULES
 module load vcftools/0.1.16
@@ -72,9 +73,9 @@ echo "imputation done"
 Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $RDA_DIR
 
 # 5. Get overlap of outlier sites with known genes
-tail -n+2 $RDA_DIR/RDA_outliers.txt > $RDA_DIR/indels_RDA_outliers.table
-echo "$(less $RDA_DIR/indels_RDA_outliers.table | wc -l) outlier indels"
+tail -n+2 $RDA_DIR/RDA_"$SD"sd_outliers.txt > $RDA_DIR/RDA_"$SD"sd_outliers.table
+echo "$(less $RDA_DIR/RDA_"$SD"sd_outliers.table | wc -l) outlier indels"
 
-bedtools window -a $ANNOT_TABLE -b $RDA_DIR/indels_RDA_outliers.table -w $OVERLAP_WIN > $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp.table
+bedtools window -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers.table -w $OVERLAP_WIN > $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table
 
-echo "$(less $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_overlap"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier indel"
+echo "$(less $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier indel"
