@@ -4,10 +4,10 @@
 # Specify window size at positional arg 1 and number of sd at arg 2
 
 # manitou
-# srun -p small -c 2 --mem=30G -J 03.9_indels_rda -o log/03.9_indels_rda_%j.log /bin/sh 01_scripts/03.9_indels_rda.sh 10000 &
+# srun -p small -c 2 --mem=30G -J 03.9_indels_rda -o log/03.9_indels_rda_%j.log /bin/sh 01_scripts/03.9_indels_rda.sh 10000 2.5 &
 
 # valeria
-# srun -p ibis_small -c 2 --mem=30G -J 03.9_indels_rda -o log/03.9_indels_rda_%j.log /bin/sh 01_scripts/03.9_indels_rda.sh 10000 &
+# srun -p ibis_small -c 2 --mem=30G -J 03.9_indels_rda -o log/03.9_indels_rda_%j.log /bin/sh 01_scripts/03.9_indels_rda.sh 10000 2.5 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -70,7 +70,7 @@ Rscript 01_scripts/utils/impute_missing.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD
 echo "imputation done"
 
 # 4. Run RDA
-Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $RDA_DIR
+Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $SD $RDA_DIR
 
 # 5. Get overlap of outlier sites with known genes
 tail -n+2 $RDA_DIR/RDA_"$SD"sd_outliers.txt > $RDA_DIR/RDA_"$SD"sd_outliers.table
