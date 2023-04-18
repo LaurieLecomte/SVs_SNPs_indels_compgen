@@ -48,7 +48,7 @@ less $CHR_LIST | while read CHR
 do 
   echo "convert vcf to beagle for $CHR"
   #vcftools --gzvcf $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".maf"$MIN_MAF".vcf.gz --BEAGLE-PL --chr $CHR --out $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".maf"$MIN_MAF"_$CHR
-  vcftools --gzvcf $ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".vcf.gz --BEAGLE-PL --chr $CHR --out $ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)"_$CHR
+  vcftools --gzvcf $INDELS_VCF_ANGSD --BEAGLE-PL --chr $CHR --out $ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)"_$CHR
 done
 
 ## Extract header from 1st chromosome beagle
@@ -84,12 +84,12 @@ less $ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".norm.be
 
 # 3. Compress 
 #gzip $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle
-gzip $ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".norm.beagle
+gzip $ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".norm.beagle -f
 
 # Clean up
 #for file in $(ls -1 $ANGSD_STATS_DIR/*.BEAGLE.PL); do rm $file; done
 for file in $(ls -1 $ANGSD_INPUT_DIR/*.BEAGLE.PL); do rm $file; done
 #for file in $(ls -1 $ANGSD_STATS_DIR/*.log); do rm $file; done
-for file in $(ls -1 $ANGSD_INPUT_DIR/*.log); do rm $file; done
+#for file in $(ls -1 $ANGSD_INPUT_DIR/*.log); do rm $file; done
 #rm $ANGSD_STATS_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.contents
 rm $ANGSD_INPUT_DIR/"$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)".norm.beagle.contents

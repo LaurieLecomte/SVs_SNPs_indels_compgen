@@ -66,7 +66,7 @@ do
 	#bcftools view -S 02_infos/"$POP"_IDs.txt $FILT_ANGSD_VCF --threads $CPU | bcftools sort -Oz > $ANGSD_BYPOP_DIR/$(basename -s .vcf.gz $FILT_ANGSD_VCF)_"$POP".vcf.gz
     bcftools view -S 02_infos/"$POP"_IDs.txt $INDELS_VCF_ANGSD --threads $CPU | bcftools sort -Oz > $ANGSD_BYPOP_DIR/$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)_"$POP".vcf.gz
 	#tabix -p vcf $ANGSD_BYPOP_DIR/$(basename -s .vcf.gz $FILT_ANGSD_VCF)_"$POP".vcf.gz -f
-    tabix -p vcf $INDELS_VCF_ANGSD/$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)_"$POP".vcf.gz -f
+    tabix -p vcf $ANGSD_BYPOP_DIR/$(basename -s .recoded.vcf.gz $INDELS_VCF_ANGSD)_"$POP".vcf.gz -f
 	
 	#echo "Calculate the SAF, MAF for $N_IND in vcf $FILT_ANGSD_VCF"
     echo "Calculate the SAF, MAF for $N_IND in vcf $INDELS_VCF_ANGSD"
