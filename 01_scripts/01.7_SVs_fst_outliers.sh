@@ -6,10 +6,10 @@
 # Works on ONE population pair at the time, so variables ANGSD_FST_VCF, RAW_FST_VCF and POP_PAIR must be adjusted accordingly - I only have 2 populations (RO and PU), so VCF names will be written as is
 
 # manitou
-# srun -p small -c 1 -J SVs_fst_outliers_quantiles -o log/SVs_fst_outliers_quantiles_%j.log /bin/sh 01_scripts/SVs_fst_outliers_quantiles.sh 10000 0.95 &
+# srun -p small -c 1 -J 01.7_SVs_fst_outliers -o log/01.7_SVs_fst_outliers_%j.log /bin/sh 01_scripts/01.7_SVs_fst_outliers.sh 10000 0.95 &
 
 # valeria
-# srun -p ibis_small -c 1 -J SVs_fst_outliers_quantiles -o log/SVs_fst_outliers_quantiles_%j.log /bin/sh 01_scripts/SVs_fst_outliers_quantiles.sh 10000 0.95 &
+# srun -p ibis_small -c 1 -J 01.7_SVs_fst_outliers -o log/01.7_SVs_fst_outliers_%j.log /bin/sh 01_scripts/01.7_SVs_fst_outliers.sh 10000 0.95 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"

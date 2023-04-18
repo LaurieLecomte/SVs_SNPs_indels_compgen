@@ -17,7 +17,7 @@ Fst_table$FST <- ifelse(Fst_table$FST < 0, yes = 0, no = Fst_table$FST)
 
 
 # 2. Compute Fst cutoff based on quantile ---------------------------------
-fst_cutoff <- (quantile(Fst_table$FST, CUTOFF, na.rm = TRUE))
+fst_cutoff <- round(quantile(Fst_table$FST, CUTOFF, na.rm = TRUE), digits = 3)
 print(fst_cutoff)
 
 writeLines(text = as.character(unname(fst_cutoff)), con = paste0(unlist(strsplit(FST_TABLE, split = '.table')), '_quantile', CUTOFF, '_Fst_cutoff.txt'))
