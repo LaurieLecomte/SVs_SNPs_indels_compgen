@@ -68,7 +68,7 @@ bcftools query -f "%CHROM\t%POS\t%END\t%ID\t%FST_"$POP1"_"$POP2"\n" $RAW_FST_VCF
 #bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table -w $OVERLAP_WIN > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSNPs.table
 bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table -w $OVERLAP_WIN > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSNPs.table
 
-echo "$(less $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSNPs.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of a filtered genotyped SNP"
+echo "$(less $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)"_overlap"$OVERLAP_WIN"bp_allSNPs.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of a filtered genotyped SNP"
 
 # 3. Find overlap between OUTLIER SNPs and known genes
 ## Find outlier SNPs with Fst > MIN_FST
