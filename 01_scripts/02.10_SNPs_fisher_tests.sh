@@ -5,10 +5,10 @@
 # Specify window size at positional arg 1 and max allowed q value at arg 2
 
 # manitou
-# srun -p small -c 1 -J 02.10_SNPs_fisher_tests -o log/02.10_SNPs_fisher_tests_%j.log /bin/sh 01_scripts/02.10_SNPs_fisher_tests.sh 10000 0.01 &
+# srun -p small -c 1 --mem=20G -J 02.10_SNPs_fisher_tests -o log/02.10_SNPs_fisher_tests_%j.log /bin/sh 01_scripts/02.10_SNPs_fisher_tests.sh 10000 0.01 &
 
 # valeria
-# srun -p ibis_small -c 1 -J 02.10_SNPs_fisher_tests -o log/02.10_SNPs_fisher_tests_%j.log /bin/sh 01_scripts/02.10_SNPs_fisher_tests.sh 10000 0.01 &
+# srun -p ibis_small -c 1 --mem=20G -J 02.10_SNPs_fisher_tests -o log/02.10_SNPs_fisher_tests_%j.log /bin/sh 01_scripts/02.10_SNPs_fisher_tests.sh 10000 0.01 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
