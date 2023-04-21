@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Perform GO enrichment analysis on a set of genes located near (at 10000 bp) outlier SVs, given their high Fst (0.4)
-# Specify window size at positional arg 1, and min Fst threshold at positional arg 2
+# Specify window size at positional arg 1, and quantile threshold at positional arg 2
 # Launch in a conda env where goatools is installed
 
 # manitou
-# srun -p small -c 1 -J 01.8_SVs_fst_go -o log/01.8_SVs_fst_go_%j.log /bin/sh 01_scripts/01.8_SVs_fst_go.sh 10000 0.44 &
+# srun -p small -c 1 -J 01.8_SVs_fst_go -o log/01.8_SVs_fst_go_%j.log /bin/sh 01_scripts/01.8_SVs_fst_go.sh 10000 0.98 &
 
 # valeria
-# srun -p ibis_small -c 1 -J 01.8_SVs_fst_go -o log/01.8_SVs_fst_go_%j.log /bin/sh 01_scripts/01.8_SVs_fst_go.sh 10000 0.44 &
+# srun -p ibis_small -c 1 -J 01.8_SVs_fst_go -o log/01.8_SVs_fst_go_%j.log /bin/sh 01_scripts/01.8_SVs_fst_go.sh 10000 0.98 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -47,7 +47,7 @@ ANGSD_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .recoded.vcf.gz $SV_VCF_ANGSD)".SVs
 RAW_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".SVsFst_"$POP1"_"$POP2".vcf.gz" # input VCF (NOT the one formatted for angsd), with added Fst values from previous script
 
 OVERLAP_WIN=$1
-MIN_FST=$2
+QUANTILE=$2
 
 GENOME_ANNOT="03_genome/annotation/genome_annotation_table_simplified_1.5.tsv"
 ANNOT_TABLE="03_genome/annotation/"$(basename -s .tsv $GENOME_ANNOT)".table"
@@ -60,6 +60,8 @@ GO_ANNOT="12_go/go_db/all_go_annotations.csv"
 less $ANNOT_TABLE | cut -f5 | sort | uniq > $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt
 
 # 2. Extract gene IDs from outlier SVs table from script 01.7 = OUTLIER IDs
+MIN_FST="$(less "$ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)"_quantile"$QUANTILE"_Fst_cutoff.txt" | head -n1)"
+
 less $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_overlap"$OVERLAP_WIN"bp.table | cut -f5 | sort | uniq > $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_overlap"$OVERLAP_WIN"bp_outlierIDs.txt
 
 # 3. Run GO enrichment
