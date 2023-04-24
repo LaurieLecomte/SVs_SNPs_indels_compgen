@@ -125,3 +125,20 @@ saveRDS(plot_PC1_PC3, file = paste0(strsplit(x = COV_MAT, split = '.cov')[[1]],
                                     "_PC1_PC3.rds"))
 saveRDS(plot_PC2_PC3, file = paste0(strsplit(x = COV_MAT, split = '.cov')[[1]],
                                     "_PC2_PC3.rds"))
+
+
+# 5. Format nicer figures -------------------------------------------------
+pca_df$POP <- as.factor(pca_df$POP)
+
+library(ggpubr)
+plot_PC1_2 <- 
+ggplot(data = pca_df, aes(x = PC1, y = PC2, label = ID)) +
+  geom_point(aes(col = POP, shape = POP)) +
+  stat_ellipse(linewidth = 0.5, aes(group = POP, col = POP), show.legend = FALSE) + 
+  labs(y = paste0("PC2 (", var2, ' %)'), x = paste0("PC1 (", var1, ' %)'),
+       color = 'Population', shape = 'Population') +
+  scale_color_manual(values = c("red", "blue"))
+
+saveRDS(plot_PC1_2, file = paste0(strsplit(x = COV_MAT, split = '.cov')[[1]],
+                                    "_PC1_PC2_formatted.rds"))
+
