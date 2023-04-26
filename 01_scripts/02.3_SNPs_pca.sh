@@ -3,10 +3,10 @@
 # Convert VCF to beagle and normalize genotype likelihoods
 
 # manitou
-# srun -p small -c 1 --mem=50G -J 02.3_SNPs_pca -o log/02.3_SNPs_pca_%j.log /bin/sh 01_scripts/02.3_SNPs_pca.sh &
+# srun -p small -c 4 --mem=50G -J 02.3_SNPs_pca -o log/02.3_SNPs_pca_%j.log /bin/sh 01_scripts/02.3_SNPs_pca.sh &
 
 # valeria
-# srun -p ibis_small -c 1 --mem=50G -J 02.3_SNPs_pca -o log/02.3_SNPs_pca_%j.log /bin/sh 01_scripts/02.3_SNPs_pca.sh &
+# srun -p ibis_small -c 4 --mem=50G -J 02.3_SNPs_pca -o log/02.3_SNPs_pca_%j.log /bin/sh 01_scripts/02.3_SNPs_pca.sh &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -31,7 +31,7 @@ SNPS_VCF_ANGSD=$RAW_SNPS_VCF
 
 N_IND="$(less $ID_SEX_POP | wc -l)"
 
-CPU=1
+CPU=4
 
 MIN_MAF=0.05
 MAX_MAF=0.95
@@ -39,7 +39,7 @@ MAX_MAF=0.95
 CHR_LIST="02_infos/chr_list.txt"
 
 #SNPS_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".maf"$MIN_MAF".norm.beagle.gz"
-SNPS_BEAGLE="$ANGSD_STATS_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".norm.beagle.gz"
+SNPS_BEAGLE="$ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $SNPS_VCF_ANGSD)".norm.beagle.gz"
 COV_MAT="$PCA_DIR/"$(basename -s .norm.beagle.gz $SNPS_BEAGLE)""
 
 # LOAD REQUIRED MODULES

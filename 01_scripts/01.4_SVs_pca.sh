@@ -3,10 +3,10 @@
 # Run PCA on SVs covariance matrix
 
 # manitou
-# srun -p small -c 4 -J 01.4_SVs_pca -o log/01.4_SVs_pca_%j.log /bin/sh 01_scripts/01.4_SVs_pca.sh &
+# srun -p small -c 1 -J 01.4_SVs_pca -o log/01.4_SVs_pca_%j.log /bin/sh 01_scripts/01.4_SVs_pca.sh &
 
 # valeria
-# srun -p ibis_small -c 4 -J 01.4_SVs_pca -o log/01.4_SVs_pca_%j.log /bin/sh 01_scripts/01.4_SVs_pca.sh &
+# srun -p ibis_small -c 1 -J 01.4_SVs_pca -o log/01.4_SVs_pca_%j.log /bin/sh 01_scripts/01.4_SVs_pca.sh &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -31,7 +31,7 @@ SV_VCF_ANGSD="$ANGSD_INPUT_DIR/"$(basename -s .vcf.gz $RAW_SV_VCF)".recoded.vcf.
 
 N_IND="$(less $ID_SEX_POP | wc -l)"
 
-CPU=4
+CPU=1
 
 MIN_MAF=0.05
 MAX_MAF=0.95
