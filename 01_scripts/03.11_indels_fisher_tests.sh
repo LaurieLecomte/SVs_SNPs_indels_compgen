@@ -70,5 +70,7 @@ Rscript 01_scripts/utils/fisher_test.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FS
 
 # 3. Get overlap of outlier sites with known genes
 tail -n+2 $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".txt > $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".table
+echo "$(less $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".table | wc -l) outlier indels with Fisher qval < $MAX_QVAL"
 
 bedtools window -a $ANNOT_TABLE -b $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".table -w $OVERLAP_WIN > $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL"_overlap"$OVERLAP_WIN"bp.table
+echo "$(less $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL"_overlap"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier indel with Fisher qval < $MAX_QVAL"
