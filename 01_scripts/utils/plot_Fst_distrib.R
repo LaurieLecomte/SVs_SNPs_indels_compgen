@@ -7,6 +7,7 @@ argv <- commandArgs(T)
 INPUT_TABLE <- argv[1]
 OV_2_SSA <- argv[2]
 MEAN_FST <- argv[3]
+WIN_FST <- argv[4]
 
 # Per site Fst
 fst_table <- read.table(INPUT_TABLE, 
@@ -14,15 +15,31 @@ fst_table <- read.table(INPUT_TABLE,
                         na.strings = '.'
                         )
 
+# Per window Fst 
+fst_win <- read.table(WIN_FST, skip = 1, sep = "\t",
+                      col.names = c('REGION', 'CHROM', 'midPOS', 'Nsites', 'FST')
+)
+                
+
 ## Convert negative Fst values to 0
 fst_table$FST <- ifelse(fst_table$FST < 0, 
                         yes = 0,
                         no = fst_table$FST)
 
+fst_win$FST <- ifelse(fst_win$FST < 0, 
+                        yes = 0,
+                        no = fst_win$FST)
+
+## Get min and max
+print(paste('Min Fst :', min(fst_table$FST)))
+print(paste('Max Fst :', max(fst_table$FST)))
+
 ## Convert OV chromosomes to ssa notation
 OV_2_sasa <- read.table(OV_2_SSA, col.names = c('CHROM_OV', 'CHROM_SSA'))
 
 fst_table <- merge(x = fst_table, y = OV_2_sasa, by.x = 'CHROM', by.y = 'CHROM_OV')
+
+fst_win <- merge(x = fst_win, y = OV_2_sasa, by.x = 'CHROM', by.y = 'CHROM_OV')
 
 # Genome wide Fst
 mean_fst <- read.table(MEAN_FST, col.names = c('unweighted_FST', 'weighted_FST'))
@@ -111,3 +128,33 @@ fst_per_site_plot
 
 saveRDS(fst_per_site_plot, file = paste0(strsplit(INPUT_TABLE, split = '.table')[[1]], '_fst_per_site.rds'))
 dev.off()
+
+
+# 4. Per window Fst -------------------------------------------------------
+fst_win_plot <- 
+  ggplot(data = fst_win) +
+  facet_wrap(~ CHROM_SSA, nrow = 2, scales = 'free_x') +
+  geom_point(aes(x = midPOS, y = FST), alpha = 1.5 * fst_win$FST, size = 1.2*fst_win$FST, col = 'darkblue') +
+  theme(panel.spacing = unit(0.1, 'points'),
+        strip.text.x = element_text(size = 6),
+        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
+        panel.background = element_rect(color = "gray70"),
+        strip.placement = "inside",
+        strip.background = element_rect(colour = 'gray70')
+  ) + 
+  scale_x_continuous(
+    labels = function(x) {
+      round(x/10^8, 1)
+    }
+  ) + 
+  #ylim(0, 1) + 
+  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
+       y = 'Per window Fst') +
+  geom_hline(yintercept = mean_fst$weighted_FST, col = 'red')
+
+jpeg(file = paste0(strsplit(WIN_FST, split = '.txt')[[1]], '_fst_per_win.jpg'))
+fst_win_plot
+
+saveRDS(fst_win_plot, file = paste0(strsplit(WIN_FST, split = '.txt')[[1]], '_fst_per_win.rds'))
+dev.off()
+
