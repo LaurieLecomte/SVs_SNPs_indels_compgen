@@ -67,6 +67,7 @@ module load R/4.1
 
 # 2. Run Fisher tests
 Rscript 01_scripts/utils/fisher_test.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 02_infos/ID_POP.txt $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $POP1 $POP2 $MAX_QVAL $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"
+Rscript 01_scripts/utils/filter_fisher.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 02_infos/ID_POP.txt $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $POP1 $POP2 $MAX_QVAL $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"
 
 # 3. Get overlap of outlier sites with known genes
 tail -n+2 $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".txt > $FISHER_DIR/indels_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".table

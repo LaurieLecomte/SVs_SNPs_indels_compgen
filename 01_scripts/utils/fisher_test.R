@@ -80,14 +80,11 @@ write.table(genopos[, c('CHROM', 'POS', 'END', 'ID', 'P_VAL', 'Q_VAL')],
                         row.names = FALSE, quote = FALSE)
 
 # Filter for Q_VAL > threshold
-genopos_outliers <- subset(genopos, Q_VAL < MAX_QVAL)
+#genopos_outliers <- subset(genopos, Q_VAL < MAX_QVAL)
 
 #write.table(genopos_outliers[, c('CHROM', 'POS', 'END', 'ID', 'P_VAL', 'Q_VAL')], 
-#            file = paste0(out_dir, '/', unlist(strsplit(basename(genofile), split = '.geno_mat.012'))[1], ".outliers_qval", MAX_QVAL, "fisher.txt"), sep = "\t",
+#            file = paste0(out_file, '_outliers_qval', MAX_QVAL, '.txt'), sep = "\t",
 #            row.names = FALSE, quote = FALSE)
-write.table(genopos_outliers[, c('CHROM', 'POS', 'END', 'ID', 'P_VAL', 'Q_VAL')], 
-            file = paste0(out_file, '_outliers_qval', MAX_QVAL, '.txt'), sep = "\t",
-            row.names = FALSE, quote = FALSE)
 
 # Plot Q_VAL distribution
 q_val_distrib <- ggplot(data = genopos) + 
