@@ -7,10 +7,10 @@
 # Works on ONE population pair at the time, so variables ANGSD_FST_VCF, RAW_FST_VCF and POP_PAIR must be adjusted accordingly - I only have 2 populations (RO and PU), so VCF names will be written as is
 
 # manitou
-# srun -p small -c 1 -J 01.13_SVs_compare_outliers -o log/01.13_SVs_compare_outliers_%j.log /bin/sh 01_scripts/01.13_SVs_compare_outliers.sh 10000 0.98 3 0.01 &
+# srun -p small -c 1 -J 01.13_SVs_compare_outliers -o log/01.13_SVs_compare_outliers_%j.log /bin/sh 01_scripts/01.13_SVs_compare_outliers.sh 10000 0.97 3 0.01 &
 
 # valeria
-# srun -p ibis_small -c 1 -J 01.13_SVs_compare_outliers -o log/01.13_SVs_compare_outliers_%j.log /bin/sh 01_scripts/01.13_SVs_compare_outliers.sh 10000 0.98 3 0.01 &
+# srun -p ibis_small -c 1 -J 01.13_SVs_compare_outliers -o log/01.13_SVs_compare_outliers_%j.log /bin/sh 01_scripts/01.13_SVs_compare_outliers.sh 10000 0.97 3 0.01 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -74,10 +74,11 @@ module load R/4.1
 
 
 # 1. Find shared outliers between Fst and Fisher and candidates uniques to RDA
-Rscript 01_scripts/utils/compare_outliers_candidates_sites.R $FST_OUTLIERS $RDA_OUTLIERS $FISHER_OUTLIERS $OVERLAP_WIN $QUANTILE $MIN_FST $SD $MAX_QVAL $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared.table $RDA_DIR/RDA_"$SD"sd_outliers_uniques.table
+Rscript 01_scripts/utils/compare_outliers_candidates_sites.R $FST_OUTLIERS $RDA_OUTLIERS $FISHER_OUTLIERS $OVERLAP_WIN $QUANTILE $MIN_FST $SD $MAX_QVAL $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared.table $RDA_DIR/RDA_"$SD"sd_outliers_uniques.table $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared.table
 
 # 2. Get overlap of outliers shared between Fst and Fishers (= confidence highly diffentiated variants set) and known genes
 bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared.table -w $OVERLAP_WIN > $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp.table
+echo "$(less $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier SV"
 
 # 3. Perform GO enrichment analysis on shared outliers
 # Extract all known gene IDs in annotation table = BACKGROUND IDs
