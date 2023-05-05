@@ -8,10 +8,10 @@
 # Works on ONE population pair at the time, so variables ANGSD_FST_VCF, RAW_FST_VCF and POP_PAIR must be adjusted accordingly - I only have 2 populations (RO and PU), so VCF names will be written as is
 
 # manitou
-# srun -p small -c 1 -J 03.10_indels_rda_go -o log/03.10_indels_rda_go_%j.log /bin/sh 01_scripts/03.10_indels_rda_go.sh 10000 &
+# srun -p small -c 1 -J 03.10_indels_rda_go -o log/03.10_indels_rda_go_%j.log /bin/sh 01_scripts/03.10_indels_rda_go.sh 10000 3 &
 
 # valeria
-# srun -p ibis_small -c 1 -J 03.10_indels_rda_go -o log/03.10_indels_rda_go_%j.log /bin/sh 01_scripts/03.10_indels_rda_go.sh 10000 &
+# srun -p ibis_small -c 1 -J 03.10_indels_rda_go -o log/03.10_indels_rda_go_%j.log /bin/sh 01_scripts/03.10_indels_rda_go.sh 10000 3 &
 
 
 # VARIABLES
