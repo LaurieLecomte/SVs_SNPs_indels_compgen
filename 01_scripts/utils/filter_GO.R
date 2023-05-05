@@ -29,3 +29,4 @@ write.table(GO_table_filt,
             row.names = FALSE, quote = FALSE, sep = "\t"
             )
 
+print(paste('Number of significant enriched GO terms :', nrow(GO_table_filt)))

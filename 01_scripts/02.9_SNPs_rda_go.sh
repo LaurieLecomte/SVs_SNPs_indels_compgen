@@ -79,4 +79,7 @@ MAX_FDR=0.1
 MIN_LEVEL=1
 
 Rscript 01_scripts/utils/filter_GO.R $GO_DIR/SNPs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL 
+
+# Simplify filtered results
+less $GO_DIR/SNPs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 > $GO_DIR/SNPs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt
   
