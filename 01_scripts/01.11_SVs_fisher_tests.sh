@@ -66,7 +66,7 @@ cut -f1,3 $ID_SEX_POP > 02_infos/ID_POP.txt
 
 # 2. Run Fisher tests
 #Rscript 01_scripts/utils/fisher_test.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 02_infos/ID_POP.txt $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $POP1 $POP2 $MAX_QVAL $FISHER_DIR/SVs_fisher_"$POP1"_"$POP2"
-Rscript 01_scripts/utils/filter_fisher.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 02_infos/ID_POP.txt $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $POP1 $POP2 $MAX_QVAL $FISHER_DIR/SVs_fisher_"$POP1"_"$POP2"
+Rscript 01_scripts/utils/filter_fisher.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 02_infos/ID_POP.txt $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $POP1 $POP2 $MAX_QVAL $FISHER_DIR/SVs_fisher_"$POP1"_"$POP2" $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table
 
 # 3. Get overlap of outlier sites with known genes
 tail -n+2 $FISHER_DIR/SVs_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".txt > $FISHER_DIR/SVs_fisher_"$POP1"_"$POP2"_outliers_qval"$MAX_QVAL".table
