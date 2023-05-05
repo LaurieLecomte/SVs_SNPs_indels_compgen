@@ -33,23 +33,14 @@ write.table(genopos_outliers[, c('CHROM', 'POS', 'END', 'ID', 'P_VAL', 'Q_VAL')]
 
 
 # 3. Get min and max Fst values associated with Fisher outliers -----------
-
-# Get min Fst value (Fisher outlier with highest QVAL)
 FST_table <- read.delim(FST_TABLE, col.names = c('CHROM', 'POS', 'END', 'ID', 'FST'))
-
-## Extract variant with highest QVAL
-max_QVAL_site <- genopos_outliers[which.max(genopos_outliers$Q_VAL),]
-
-## Get corresponding Fst value in Fst table
-max_QVAL_site_FST <- merge(x = max_QVAL_site, y = FST_table,
+FST_table$FST <- ifelse(FST_table$FST < 0, 
+                        yes = 0,
+                        no = FST_table$FST)
+                        
+genopos_outliers_Fst <- merge(x = genopos_outliers, y = FST_table,
       by = c('CHROM', 'POS', 'END', 'ID'),
       all = FALSE)
 
-print(paste('Min Fst value associated with', MAX_QVAL, ':', max_QVAL_site_FST$FST))
-
-# Get max Fst value (Fisher outlier with lowest QVAL)
-min_QVAL_site <- genopos_outliers[which.min(genopos_outliers$Q_VAL),]
-min_QVAL_site_FST <- merge(x = min_QVAL_site, y = FST_table,
-                           by = c('CHROM', 'POS', 'END', 'ID'),
-                           all = FALSE)
-print(paste('Max Fst value associated with', MAX_QVAL, ':', min_QVAL_site_FST$FST))
+print(paste('Min Fst value associated with outliers with with Q_VAL <', MAX_QVAL, ':', min(genopos_outliers_Fst$FST)))
+print(paste('Min Fst value associated with outliers with with Q_VAL <', MAX_QVAL, ':', max(genopos_outliers_Fst$FST)))
