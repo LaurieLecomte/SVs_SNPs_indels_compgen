@@ -73,7 +73,7 @@ module load R/4.1
 
 
 # 1. Find shared outliers between Fst and Fisher and candidates uniques to RDA
-Rscript 01_scripts/utils/compare_outliers_candidates_sites.R $FST_OUTLIERS $RDA_OUTLIERS $FISHER_OUTLIERS $OVERLAP_WIN $QUANTILE $MIN_FST $SD $MAX_QVAL $ANGSD_FST_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared.table $RDA_DIR/RDA_"$SD"sd_outliers_uniques.table $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared.table
+Rscript 01_scripts/utils/compare_outliers_candidates_sites.R $FST_OUTLIERS $RDA_OUTLIERS $FISHER_OUTLIERS $OVERLAP_WIN $QUANTILE $MIN_FST $SD $MAX_QVAL $ANGSD_FST_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared.table $RDA_DIR/RDA_"$SD"sd_outliers_uniques.table $ANGSD_FST_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared.table
 
 # 2. Get overlap of outliers shared between Fst and Fishers (= confidence highly diffentiated variants set) and known genes
 bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared.table -w $OVERLAP_WIN > $ANGSD_FST_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp.table
