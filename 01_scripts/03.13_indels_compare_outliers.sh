@@ -103,25 +103,29 @@ Rscript 01_scripts/utils/filter_GO.R $GO_DIR/indels_"$POP1"_"$POP2"_outliers_min
 # Simplify filtered results
 less $GO_DIR/indels_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 > $GO_DIR/indels_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt
 
+# Simplify even further for running REVIGO online
+less $GO_DIR/indels_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt | tail -n+2 | cut -f1,6 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/indels_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".GO_pval.txt
+
+
 
 # 4. Get overlap of RDA unique candidates with known genes
-bedtools window -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers_uniques.table -w $OVERLAP_WIN > $RDA_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp.table
+#bedtools window -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers_uniques.table -w $OVERLAP_WIN > $RDA_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp.table
 
-# Extract gene IDs from shared outliers table
-less $RDA_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp.table | cut -f5 | sort | uniq > $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_outlierIDs.txt
+## Extract gene IDs from shared outliers table
+#less $RDA_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp.table | cut -f5 | sort | uniq > $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_outlierIDs.txt
 
-# 5. Perform GO enrichment analysis on RDA unique candidates
-python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
-  --obo $GO_DB \
-  $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_outlierIDs.txt \
-  $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt \
-  $GO_ANNOT --min_overlap 0.1 \
-  --outfile $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_GO.csv
-  
-# Filter results
-MAX_FDR=0.1
-MIN_LEVEL=1
-Rscript 01_scripts/utils/filter_GO.R $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
+## 5. Perform GO enrichment analysis on RDA unique candidates
+#python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
+#  --obo $GO_DB \
+#  $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_outlierIDs.txt \
+#  $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt \
+#  $GO_ANNOT --min_overlap 0.1 \
+#  --outfile $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_GO.csv
+#  
+## Filter results
+#MAX_FDR=0.1
+#MIN_LEVEL=1
+#Rscript 01_scripts/utils/filter_GO.R $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
 
-# Simplify filtered results
-less $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 > $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt
+## Simplify filtered results
+#less $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 > $GO_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.tx#t
