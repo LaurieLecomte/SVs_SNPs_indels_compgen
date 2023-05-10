@@ -82,4 +82,6 @@ Rscript 01_scripts/utils/filter_GO.R $GO_DIR/SNPs_"$POP1"_"$POP2"_RDA_"$SD"sd_ou
 
 # Simplify filtered results
 less $GO_DIR/SNPs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 > $GO_DIR/SNPs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt
-  
+
+# Simplify even further for running REVIGO online
+less $GO_DIR/SNPs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt | tail -n+2 | cut -f1,6 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/SNPs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".GO_pval.txt
