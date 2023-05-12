@@ -106,6 +106,10 @@ less $GO_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shar
 less $GO_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt | tail -n+2 | cut -f1,6 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".GO_pval.txt
 
 
+# 4. Get overlap of outliers shared between all 3 methods and known genes
+bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared.table -w $OVERLAP_WIN > $ANGSD_FST_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared_"$OVERLAP_WIN"bp.table
+echo "$(less $ANGSD_FST_DIR/SNPs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared_"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of a candidate SNP shared between Fst, Fisher and RDA"
+
 
 # 4. Get overlap of RDA unique candidates with known genes
 #bedtools window -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers_uniques.table -w $OVERLAP_WIN > $RDA_DIR/RDA_"$SD"sd_outliers_uniques_"$OVERLAP_WIN"bp.table
