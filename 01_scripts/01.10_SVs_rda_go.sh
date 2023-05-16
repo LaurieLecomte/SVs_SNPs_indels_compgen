@@ -8,10 +8,10 @@
 # Works on ONE population pair at the time, so variables ANGSD_FST_VCF, RAW_FST_VCF and POP_PAIR must be adjusted accordingly - I only have 2 populations (RO and PU), so VCF names will be written as is
 
 # manitou
-# srun -p small -c 1 -J 01.10_SVs_rda_go -o log/01.10_SVs_rda_go_%j.log /bin/sh 01_scripts/01.10_SVs_rda_go.sh 10000 3 &
+# srun -p small -c 1 --time=00:30:00 -J 01.10_SVs_rda_go -o log/01.10_SVs_rda_go_%j.log /bin/sh 01_scripts/01.10_SVs_rda_go.sh 10000 3 &
 
 # valeria
-# srun -p ibis_small -c 1 -J 01.10_SVs_rda_go -o log/01.10_SVs_rda_go_%j.log /bin/sh 01_scripts/01.10_SVs_rda_go.sh 10000 3 &
+# srun -p ibis_small -c 1 --time=00:30:00 -J 01.10_SVs_rda_go -o log/01.10_SVs_rda_go_%j.log /bin/sh 01_scripts/01.10_SVs_rda_go.sh 10000 3 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
@@ -82,7 +82,7 @@ MIN_LEVEL=1
 Rscript 01_scripts/utils/filter_GO.R $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
 
 # Simplify filtered results
-less $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 > $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt
+less $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' | perl -pe 's/\./\,/' > $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt
 
 # Simplify even further for running REVIGO online
 less $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt | tail -n+2 | cut -f1,6 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/SVs_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".GO_pval.txt
