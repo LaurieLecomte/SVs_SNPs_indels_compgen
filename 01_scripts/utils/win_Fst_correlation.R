@@ -1,8 +1,8 @@
 
 # 1. Access files, import and format ----------------------
-SV_WIN_FST <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/08_angsd_fst/SVs/RO_PU/RO_PU_win1000000_step10000.txt"
-SNP_WIN_FST <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/08_angsd_fst/SNPs/RO_PU/RO_PU_win1000000_step10000.txt"
-INDEL_WIN_FST <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/08_angsd_fst/indels/RO_PU/RO_PU_win1000000_step10000.txt"
+SV_WIN_FST <- "08_angsd_fst/SVs/RO_PU/RO_PU_win1000000_step10000.txt"
+SNP_WIN_FST <- "08_angsd_fst/SNPs/RO_PU/RO_PU_win1000000_step10000.txt"
+INDEL_WIN_FST <- "08_angsd_fst/indels/RO_PU/RO_PU_win1000000_step10000.txt"
 
 SVs_fst_win <- read.table(SV_WIN_FST, skip = 1, sep = "\t",
                       col.names = c('REGION', 'CHROM', 'midPOS', 'Nsites', 'FST')
