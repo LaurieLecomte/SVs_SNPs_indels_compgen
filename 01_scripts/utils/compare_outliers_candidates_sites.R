@@ -17,6 +17,7 @@ MAX_QVAL <- as.numeric(argv[8])
 
 FST_FISHER_OUTPUT <- argv[9]
 RDA_UNIQUE_OUTPUT <- argv[10]
+ALL_SHARED_OUTPUT <- argv[11]
 
 outliers_Fst <- read.table(FST_OUTLIERS, col.names = c('CHROM', 'POS', 'END', 'ID', 'FST'))
 cand_RDA <- read.table(RDA_CAND, col.names = c('CHROM', 'POS', 'END', 'ID', 'loadings'))
@@ -44,12 +45,12 @@ print(paste(
 )
 
 print(paste(
-  nrow(shared_Fst_Fisher), ' shared outliers between Fst and Fisher = high confidence outliers set'
+  nrow(shared_Fst_Fisher), 'shared outliers between Fst and Fisher'
 )
 )
 
 
-# Export
+# Export : these are intersection outliers AND include some RDA candidates
 write.table(shared_Fst_Fisher[, c('CHROM', 'POS', 'END', 'ID')], 
             file = FST_FISHER_OUTPUT,
             col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
@@ -108,7 +109,35 @@ print(paste0(
 )
 )
 
-# Export
+# Export : these are candidates that are ONLY RDA candidates, not Fst nor Fisher
 write.table(RDA_uniques[, c('CHROM', 'POS', 'END', 'ID')], 
             file = RDA_UNIQUE_OUTPUT,
+            col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
+
+
+# 4. Get shared by 3 methods ----------------------------------------------
+shared_Fst_Fisher_RDA <- merge(shared_Fst_Fisher, RDA_shared, by = c('CHROM', 'POS', 'END', 'ID'), all = FALSE, sort = FALSE)
+print(paste(nrow(shared_Fst_Fisher_RDA), 'candidates are shared between Fst, Fisher and RDA'))
+
+# Export
+write.table(shared_Fst_Fisher_RDA[, c('CHROM', 'POS', 'END', 'ID')], 
+            file = ALL_SHARED_OUTPUT,
+            col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
+
+
+# 5. Create non overlapping sets of variants ------------------------------
+# We remove variants that are an outlier AND a RDA candidate
+outliers_set <- dplyr::anti_join(shared_Fst_Fisher, shared_Fst_Fisher_RDA, by = c('CHROM', 'POS', 'END', 'ID'))
+
+print(paste(nrow(outliers_set), 'intersection outliers that are not also RDA candidates = final OUTLIERS set'))
+
+write.table(shared_Fst_Fisher_RDA[, c('CHROM', 'POS', 'END', 'ID')], 
+            file = paste0(strsplit(FST_FISHER_OUTPUT, split = '_shared.table'), '_outliers_set.table'),
+            col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
+
+RDA_cand_set <- dplyr::anti_join(cand_RDA, shared_Fst_Fisher_RDA, by = c('CHROM', 'POS', 'END', 'ID'))
+print(paste(nrow(RDA_cand_set), 'RDA candidates that are not also in intersection outliers set = final RDA candidates set'))
+
+write.table(RDA_cand_set[, c('CHROM', 'POS', 'END', 'ID')], 
+            file = paste0(strsplit(RDA_CAND, split = '.table'), '_RDA_cand_set.table'),
             col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
