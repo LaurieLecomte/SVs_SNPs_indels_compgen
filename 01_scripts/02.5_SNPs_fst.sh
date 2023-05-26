@@ -49,7 +49,7 @@ module load pcangsd/1.10
 module load bcftools/1.13
 
 # VARIABLES FOR ANGSD
-WINDOW=1000000
+WINDOW=100000
 WIN_STEP=10000 
 
 
