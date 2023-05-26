@@ -129,14 +129,14 @@ write.table(shared_Fst_Fisher_RDA[, c('CHROM', 'POS', 'END', 'ID')],
 # We remove variants that are an outlier AND a RDA candidate
 outliers_set <- dplyr::anti_join(shared_Fst_Fisher, shared_Fst_Fisher_RDA, by = c('CHROM', 'POS', 'END', 'ID'))
 
-print(paste(nrow(outliers_set), 'intersection outliers that are not also RDA candidates = final OUTLIERS set'))
+print(paste(nrow(outliers_set), 'intersection outliers that are not also RDA candidates = outliers set for chi test'))
 
-write.table(shared_Fst_Fisher_RDA[, c('CHROM', 'POS', 'END', 'ID')], 
+write.table(outliers_set[, c('CHROM', 'POS', 'END', 'ID')], 
             file = paste0(strsplit(FST_FISHER_OUTPUT, split = '_shared.table'), '_outliers_set.table'),
             col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
 
 RDA_cand_set <- dplyr::anti_join(cand_RDA, shared_Fst_Fisher_RDA, by = c('CHROM', 'POS', 'END', 'ID'))
-print(paste(nrow(RDA_cand_set), 'RDA candidates that are not also in intersection outliers set = final RDA candidates set'))
+print(paste(nrow(RDA_cand_set), 'RDA candidates that are not also in intersection outliers set = RDA candidates set for chi test'))
 
 write.table(RDA_cand_set[, c('CHROM', 'POS', 'END', 'ID')], 
             file = paste0(strsplit(RDA_CAND, split = '.table'), '_RDA_cand_set.table'),
