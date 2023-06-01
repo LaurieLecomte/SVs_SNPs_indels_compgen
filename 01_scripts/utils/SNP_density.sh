@@ -64,13 +64,13 @@ module load R/4.1
 
 
 # 1. Remove header from CHROM_POS_END_ID file (previously used for RDA and Fisher tests)
-less $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table | tail -n+2 > $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.bed
+#less $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table | tail -n+2 > $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.bed
 
 # 2. Split genome by window
 bedops --chop $WIN_SIZE -x $CHR_BED > 02_infos/chrs_win"$WIN_SIZE".bed
 
 # 3. Get number of overlap between fixed size windows and sites 
-bedtools intersect -a 02_infos/chrs_win"$WIN_SIZE".bed -b $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.bed -c > $DENSITY_DIR/SNPs_density_win"$WIN_SIZE"bp.txt
+bedtools intersect -a 02_infos/chrs_win"$WIN_SIZE".bed -b $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table -c > $DENSITY_DIR/SNPs_density_win"$WIN_SIZE"bp.txt
 
 # 4. Compute mean density by window and plot
 Rscript 01_scripts/utils/compute_plot_density.R $DENSITY_DIR/SNPs_density_win"$WIN_SIZE"bp.txt 02_infos/OV_to_ssa.txt $WIN_SIZE
