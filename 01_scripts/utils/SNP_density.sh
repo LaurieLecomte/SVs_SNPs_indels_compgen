@@ -4,10 +4,10 @@
 # 02.8_SNPs_rda.sh is a prequisite to this script, which uses the raw 012 matrix and CHROM_POS_END_ID files produced when doing RDA
 
 # manitou
-# srun -p small -c 1 -J SNP_density -o log/SNP_density_%j.log /bin/sh 01_scripts/utils/SNP_density.sh 1000000 &
+# srun -p small -c 1 -J SNP_density -o log/SNP_density_%j.log /bin/sh 01_scripts/utils/SNP_density.sh 100000 &
 
 # valeria
-# srun -p ibis_small -c 1 -J SNP_density -o log/SNP_density_%j.log /bin/sh 01_scripts/utils/SNP_density.sh 1000000 &
+# srun -p ibis_small -c 1 -J SNP_density -o log/SNP_density_%j.log /bin/sh 01_scripts/utils/SNP_density.sh 100000 &
 
 # VARIABLES
 GENOME="03_genome/genome.fasta"
