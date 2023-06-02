@@ -8,6 +8,7 @@ INPUT_TABLE <- argv[1]
 OV_2_SSA <- argv[2]
 MEAN_FST <- argv[3]
 WIN_FST <- argv[4]
+WIN_SIZE <- as.numeric(argv[5])
 
 # Per site Fst
 fst_table <- read.table(INPUT_TABLE, 
@@ -36,6 +37,15 @@ print(paste('Max Fst :', max(fst_table$FST)))
 
 ## Convert OV chromosomes to ssa notation
 OV_2_sasa <- read.table(OV_2_SSA, col.names = c('CHROM_OV', 'CHROM_SSA'))
+## simplify for plotting
+OV_2_sasa$CHROM_NUM <- sapply(X = OV_2_sasa$CHROM_SSA, FUN = function(x){
+  unlist(strsplit(x, split = 'ssa'))[2]}
+  )
+
+OV_2_sasa$CHROM_TYPE <- ifelse(OV_2_sasa$CHROM_SSA %in% c('ssa01-23', paste0('ssa0', seq(2,8))),
+       yes = 'meta',
+       no = 'acro')
+
 
 fst_table <- merge(x = fst_table, y = OV_2_sasa, by.x = 'CHROM', by.y = 'CHROM_OV')
 
@@ -104,7 +114,7 @@ dev.off()
 # 3. Per site Fst ---------------------------------------------------------
 fst_per_site_plot <- 
 ggplot(data = fst_table) +
-  facet_wrap(~ CHROM_SSA, nrow = 2, scales = 'free_x') +
+  facet_grid(.~CHROM_NUM, scales = 'free_x') +
   geom_point(aes(x = POS, y = FST), alpha = 1.5 * fst_table$FST, size = 1.2*fst_table$FST, col = 'darkblue') +
   theme(panel.spacing = unit(0.1, 'points'),
         strip.text.x = element_text(size = 6),
@@ -133,10 +143,11 @@ dev.off()
 # 4. Per window Fst -------------------------------------------------------
 fst_win_plot <- 
   ggplot(data = fst_win) +
-  facet_wrap(~ CHROM_SSA, nrow = 2, scales = 'free_x') +
+  #facet_wrap(~ CHROM_SSA, nrow = 2, scales = 'free_x') +
+  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
   geom_point(aes(x = midPOS, y = FST), alpha = 1.5 * fst_win$FST, size = 1.2*fst_win$FST, col = 'darkblue') +
-  theme(panel.spacing = unit(0.1, 'points'),
-        strip.text.x = element_text(size = 6),
+  theme(panel.spacing = unit(0.8, 'points'),
+        strip.text.x = element_text(size = 5),
         axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
         panel.background = element_rect(color = "gray70"),
         strip.placement = "inside",
@@ -157,4 +168,66 @@ fst_win_plot
 
 saveRDS(fst_win_plot, file = paste0(strsplit(WIN_FST, split = '.txt')[[1]], '_fst_per_win.rds'))
 dev.off()
+
+
+# meta vs centro
+acro <- subset(fst_win, CHROM_TYPE == 'acro')
+fst_win_chr_acro <-
+  ggplot(data = acro) + 
+  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
+  geom_point(aes(x = midPOS, y = FST), size = 0.8, alpha = 0.6,
+             col = 'firebrick') +
+  theme(panel.spacing = unit(0.1, 'points'),
+        strip.text.x = element_text(size = 6),
+        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
+        panel.background = element_rect(color = "gray70"),
+        strip.placement = "inside",
+        strip.background = element_rect(colour = 'gray70'),
+        legend.position = 'bottom'
+  ) + 
+  scale_x_continuous(
+    labels = function(x) {
+      round(x/10^8, 1)
+    }
+  ) + 
+  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
+       y = paste('Fst by', WIN_SIZE/1000000, 'Mb window')) 
+
+meta <- subset(fst_win, CHROM_TYPE == 'meta')
+fst_win_chr_meta <-
+  ggplot(data = meta) + 
+  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
+  geom_point(aes(x = midPOS, y = FST), size = 0.8, alpha = 0.6,
+             col = 'blue') +
+  theme(panel.spacing = unit(0.1, 'points'),
+        strip.text.x = element_text(size = 6),
+        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
+        panel.background = element_rect(color = "gray70"),
+        strip.placement = "inside",
+        strip.background = element_rect(colour = 'gray70'),
+        legend.position = 'bottom'
+  ) + 
+  scale_x_continuous(
+    labels = function(x) {
+      round(x/10^8, 1)
+    }
+  ) + 
+  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
+       y = paste('Fst by', WIN_SIZE/1000000, 'Mb window')) 
+
+
+library(ggpubr)
+fst_win_plot_chr_type <- 
+  ggarrange(fst_win_chr_acro, 
+            fst_win_chr_meta, 
+            ncol = 1, nrow = 2, common.legend = TRUE, legend = 'bottom',
+            label.x = 0.05,
+            label.y = 0.8,
+            labels = list('acro', 'meta'))
+
+ggsave(fst_win_plot_chr_type, filename = paste0(unlist(strsplit(WIN_FST, split = '.txt')), '_chr_type_plot.jpg'), width = 10, height = 6)
+
+
+saveRDS(fst_win_plot_chr_type, file = paste0(unlist(strsplit(WIN_FST, split = '.txt')), '_chr_type_plot.rds'))
+
 

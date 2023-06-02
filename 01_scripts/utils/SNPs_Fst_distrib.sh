@@ -51,6 +51,9 @@ MIN_FST=$2
 ANNOT_TABLE="11_annotation/genome_annotation/"$(basename -s .tsv $GENOME_ANNOT)".bed"
 SNP_BED="$ANNOT_DIR/SNPs_"$POP1"_"$POP2".bed"
 
+FST_WIN=100000
+FST_STEP=10000
+
 # LOAD REQUIRED MODULES
 module load R/4.1
 module load bcftools/1.13
@@ -58,10 +61,10 @@ module load bcftools/1.13
 # 1. Extract Fst value from VCF
 bcftools query -f "%CHROM\t%POS\t%END\t%ID\t%FST_"$POP1"_"$POP2"\n" $RAW_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table
 
-bcftools query -f "%CHROM\t%POS\t%END\t%ID\t%FST_"$POP1"_"$POP2"\n" $ANGSD_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table
+#bcftools query -f "%CHROM\t%POS\t%END\t%ID\t%FST_"$POP1"_"$POP2"\n" $ANGSD_FST_VCF > $ANGSD_FST_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".table
 
 # 2. Plot Fst distribution and per site Fst
-Rscript 01_scripts/utils/plot_Fst_distrib.R $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table 02_infos/OV_to_ssa.txt $ANGSD_FST_DIR/"$POP1"_"$POP2"/"$POP1"_"$POP2".SNPs.fst
+Rscript 01_scripts/utils/plot_Fst_distrib.R $ANGSD_FST_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".table 02_infos/OV_to_ssa.txt $ANGSD_FST_DIR/"$POP1"_"$POP2"/"$POP1"_"$POP2".SNPs.fst $ANGSD_FST_DIR/"$POP1"_"$POP2"/"$POP1"_"$POP2"_win"$FST_WIN"_step"$FST_STEP".txt $FST_WIN
 
 
 
