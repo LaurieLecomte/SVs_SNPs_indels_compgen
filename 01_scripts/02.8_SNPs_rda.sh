@@ -71,11 +71,3 @@ Rscript 01_scripts/utils/impute_missing.R $RDA_DIR/"$(basename -s .vcf.gz $RAW_F
 
 # 4. Run RDA
 Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $SD $RDA_DIR
-
-# 5. Get overlap of outlier sites with known genes
-tail -n+2 $RDA_DIR/RDA_"$SD"sd_outliers.txt > $RDA_DIR/RDA_"$SD"sd_outliers.table
-echo "$(less $RDA_DIR/RDA_"$SD"sd_outliers.table | wc -l) outlier SNPs"
-
-bedtools window -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers.table -w $OVERLAP_WIN > $RDA_DIR/SNPs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table
-
-echo "$(less $RDA_DIR/SNPs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier SNP"

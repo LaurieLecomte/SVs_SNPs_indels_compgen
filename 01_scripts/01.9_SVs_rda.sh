@@ -47,7 +47,7 @@ GENOME_ANNOT="03_genome/annotation/genome_annotation_table_simplified_1.5.tsv"
 ANNOT_TABLE="03_genome/annotation/"$(basename -s .tsv $GENOME_ANNOT)".table"
 
 OVERLAP_WIN=$1
-SD=
+SD=$2
 
 # LOAD REQUIRED MODULES
 module load vcftools/0.1.16
@@ -70,12 +70,6 @@ echo "imputation done"
 # 4. Run RDA
 Rscript 01_scripts/utils/rda.R $RDA_DIR/"$(basename -s .vcf.gz $ANGSD_FST_VCF)".geno_mat.012 $ID_SEX_POP $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table $SD $RDA_DIR
 
-# 5. Get overlap of outlier sites with known genes
-tail -n+2 $RDA_DIR/RDA_"$SD"sd_outliers.txt > $RDA_DIR/RDA_"$SD"sd_outliers.table
-echo "$(less $RDA_DIR/RDA_"$SD"sd_outliers.table | wc -l) outlier SVs"
 
-bedtools window -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers.table -w $OVERLAP_WIN > $RDA_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table
-
-echo "$(less $RDA_DIR/SVs_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_overlap"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier SV"
 
 

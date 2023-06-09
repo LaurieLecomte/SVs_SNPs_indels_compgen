@@ -16,6 +16,9 @@ OUT_DIR <- argv[5]
 GEN_MAT_PATH <- paste0(FILE, ".imp")
 INDV_FILE <- paste0(FILE, '.indv')
 
+print(paste('out dir :', OUT_DIR))
+print(paste('SDs :', SD))
+
 # Imputed 012 matrix 
 geno.012.imp <- fread(GEN_MAT_PATH, header = TRUE, showProgress = TRUE) 
 geno.012.imp <- as.data.frame(geno.012.imp)

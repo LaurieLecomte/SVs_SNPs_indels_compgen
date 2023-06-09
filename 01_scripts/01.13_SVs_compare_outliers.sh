@@ -81,6 +81,7 @@ Rscript 01_scripts/utils/compare_outliers_candidates_sites.R $FST_OUTLIERS $RDA_
 bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared.table -w $OVERLAP_WIN > $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp.table
 echo "$(less $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of an outlier SV"
 
+
 # 3. Perform GO enrichment analysis on shared outliers
 # Extract all known gene IDs in annotation table = BACKGROUND IDs
 less $ANNOT_TABLE | cut -f5 | sort | uniq > $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt
@@ -96,7 +97,7 @@ python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
   $GO_ANNOT --min_overlap 0.1 \
   --outfile $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.csv
   
-# Filter results
+# Filter results  
 MAX_FDR=0.1
 MIN_LEVEL=1
 Rscript 01_scripts/utils/filter_GO.R $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.csv $MAX_FDR $MIN_LEVEL
@@ -107,9 +108,29 @@ less $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_share
 # Simplify even further for running REVIGO online
 less $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt | tail -n+2 | cut -f1,6 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_"$OVERLAP_WIN"bp_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".GO_pval.txt
 
+
+# With bedtools intersect
+bedtools intersect -a $ANNOT_TABLE -b $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared.table > $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect.table
+echo "$(less $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) overlapped by an outlier SV"
+
+less $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect.table | cut -f5 | sort | uniq > $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect_outlierIDs.txt
+
+python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
+  --obo $GO_DB \
+  $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect_outlierIDs.txt \
+  $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt \
+  $GO_ANNOT --min_overlap 0.1 \
+  --outfile $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect_GO.csv
+
+Rscript 01_scripts/utils/filter_GO.R $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect_GO.csv $MAX_FDR $MIN_LEVEL
+
+less $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt
+
+less $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt | tail -n+2 | cut -f1,6 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_shared_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".GO_pval.txt
+
 # 4. Get overlap of outliers shared between all 3 methods and known genes
-bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared.table -w $OVERLAP_WIN > $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared_"$OVERLAP_WIN"bp.table
-echo "$(less $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared_"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of a candidate SV shared between Fst, Fisher and RDA"
+#bedtools window -a $ANNOT_TABLE -b $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared.table -w $OVERLAP_WIN > $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared_"$OVERLAP_WIN"bp.table
+#echo "$(less $ANGSD_FST_DIR/SVs_"$POP1"_"$POP2"_outliers_minFst"$MIN_FST"_qval"$MAX_QVAL"_RDA_"$SD"sd_shared_"$OVERLAP_WIN"bp.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) located at < $OVERLAP_WIN bp of a candidate SV shared between Fst, Fisher and RDA"
 
 
 # 5. FOR CHI SQUARE TESTS : Get overlap of outliers shared between Fst and Fisher but NOT in RDA candidates and known genes (and RDA candidates not in inersection outliers set)
