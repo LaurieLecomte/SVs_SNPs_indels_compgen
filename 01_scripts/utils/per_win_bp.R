@@ -66,7 +66,9 @@ ggplot(data = bp_per_win) +
       round(x/10^8, 1)
     }
   ) + 
-  ylim(0, 0.2) + 
+  ylim(0, ifelse(test = max(bp_per_win$prop) > 0.2,
+                 yes = 0.75,
+                 no = 0.2)) + 
   labs(x = expression(paste('Position (', 10^8, ' bp)' )),
        y = paste('Base pairs covered by', WIN_SIZE/1000000, 'Mb window'))
 
