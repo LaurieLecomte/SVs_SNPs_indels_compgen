@@ -51,6 +51,7 @@ CHR_BED="02_infos/chrs.bed"
 
 DENSITY_DIR="density/SVs"
 
+MATCHED_SV="$VCF_DIR/SVs/merged_SUPP2_MAF0.05_FMISS0.5_matched_offset5bp.txt"
 
 # LOAD REQUIRED MODULES
 module load vcftools/0.1.16
@@ -70,4 +71,4 @@ bedops --chop $WIN_SIZE -x $CHR_BED > 02_infos/chrs_win"$WIN_SIZE".bed
 bedtools intersect -a 02_infos/chrs_win"$WIN_SIZE".bed -b $RDA_DIR/"$(basename -s .vcf.gz $RAW_FST_VCF)".CHR_POS_END_ID.table -wa -wb > $DENSITY_DIR/SVs_intersect_win"$WIN_SIZE"bp.txt
 
 # 4. Compute number of bp and prop
-Rscript 01_scripts/utils/per_win_bp.R $DENSITY_DIR/SVs_intersect_win"$WIN_SIZE"bp.txt 02_infos/OV_to_ssa.txt $WIN_SIZE
+Rscript 01_scripts/utils/SVs_per_win_bp.R $DENSITY_DIR/SVs_intersect_win"$WIN_SIZE"bp.txt 02_infos/OV_to_ssa.txt $WIN_SIZE $MATCHED_SV 
