@@ -63,8 +63,10 @@ ggplot(data = ALL_Fst_win) +
     }
   ) + 
   labs(x = expression(paste('Position (', 10^8, ' bp)' )),
-       y = 'Per window Fst') + 
+       y = expression(paste('Per window ', italic('F'['ST'])))
+                      ) + 
   guides(color = FALSE)
 # +
   #geom_hline(yintercept = mean_fst$weighted_FST, col = 'red')
 
+#ggsave()
