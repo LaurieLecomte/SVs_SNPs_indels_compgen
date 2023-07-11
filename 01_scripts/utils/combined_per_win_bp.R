@@ -73,3 +73,11 @@ SVs_SNPs_bp_win$SVs_bp_to_SNPs_bp <- (SVs_SNPs_bp_win$prop.x / SVs_SNPs_bp_win$p
 mean(SVs_SNPs_bp_win$SVs_bp_to_SNPs_bp, na.rm = TRUE)
 max(SVs_SNPs_bp_win$SVs_bp_to_SNPs_bp, na.rm = TRUE)
 min(SVs_SNPs_bp_win$SVs_bp_to_SNPs_bp, na.rm = TRUE)
+
+
+SVs_indels_bp_win <- merge(SVs_bp_win, indels_bp_win, by = c('CHROM_NUM', 'midBIN'), all = TRUE)
+SVs_indels_bp_win$SVs_bp_to_indels_bp <- (SVs_indels_bp_win$prop.x / SVs_indels_bp_win$prop.y)
+
+mean(SVs_indels_bp_win$SVs_bp_to_indels_bp, na.rm = TRUE)
+max(SVs_indels_bp_win$SVs_bp_to_indels_bp, na.rm = TRUE)
+min(SVs_indels_bp_win$SVs_bp_to_indels_bp, na.rm = TRUE)
