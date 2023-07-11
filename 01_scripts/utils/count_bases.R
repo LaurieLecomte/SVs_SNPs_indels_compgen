@@ -50,7 +50,7 @@ SVs$LEN <- SVs$END - SVs$POS
 #  sum(abs(SVs$SVLEN[SVs$SVTYPE == x]))
 #})
 
-bp_SVs_noINS <- sum(abs(SVs$LEN))
+bp_SVs_noINS <- sum(abs(SVs$LEN)) # this excludes INSs as their END and POS is identical
 bp_SVs <- sum(abs(SVs$CAND_SVLEN), na.rm = TRUE)
 
 bp_SNPs <- nrow(SNPs) # 1 bp per SNP
