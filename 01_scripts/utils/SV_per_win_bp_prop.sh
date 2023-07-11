@@ -3,6 +3,9 @@
 # Compute bp covered by SVs for a given window size, specified at positional arg 1
 # 01.9_SVs_rda.sh is a prequisite to this script, which uses the raw 012 matrix and CHROM_POS_END_ID files produced when doing RDA
 
+# PREREQUISITE : matching genotyped SVs with known candidates based on POS and ALT seq len in the genotype_SVs_SRLR pipeline (https://github.com/LaurieLecomte/genotype_SVs_SRLR/blob/main/01_scripts/utils/compare_summarize_plot.sh)
+# Copy output *_matched_offset5bp.txt to 04_vcf/SVs directory of current pipeline (SVs_SNPs_indels_compgen) 
+
 # manitou
 # srun -p small -c 1 -J SV_per_win_bp_prop -o log/SV_per_win_bp_prop_%j.log /bin/sh 01_scripts/utils/SV_per_win_bp_prop.sh 100000 &
 
@@ -51,7 +54,9 @@ CHR_BED="02_infos/chrs.bed"
 
 DENSITY_DIR="density/SVs"
 
-MATCHED_SV="$RAW_VCF_DIR/merged_SUPP2_MAF0.05_FMISS0.5_matched_offset5bp.txt"
+MATCHED_SV="$RAW_VCF_DIR/merged_SUPP2_MAF0.05_FMISS0.5_matched_offset5bp.txt" # this file is produced by the script compare_summarize_plot.sh from the gnotype_SVs_SRLR pipeline (https://github.com/LaurieLecomte/genotype_SVs_SRLR/blob/main/01_scripts/utils/compare_summarize_plot.sh)
+
+
 
 # LOAD REQUIRED MODULES
 module load vcftools/0.1.16

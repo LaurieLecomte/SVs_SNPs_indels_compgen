@@ -4,6 +4,10 @@
 
 # srun -p small -c 1 -J variants_prop -o log/variants_prop_%j.log /bin/sh 01_scripts/utils/variants_prop.sh &
 
+# PREREQUISITE : matching genotyped SVs with known candidates based on POS and ALT seq len in the genotype_SVs_SRLR pipeline (https://github.com/LaurieLecomte/genotype_SVs_SRLR/blob/main/01_scripts/utils/compare_summarize_plot.sh)
+# Copy output *_matched_offset5bp.txt to 04_vcf/SVs directory of current pipeline (SVs_SNPs_indels_compgen) 
+
+
 # VARIABLES
 GENOME="03_genome/genome.fasta"
 VCF_DIR="04_vcf"
@@ -19,7 +23,7 @@ CHRS_BED="02_infos/chrs.bed"
 #ANGSD_FST_VCF="$ANGSD_FST_DIR/"$(basename -s .vcf.gz $FILT_ANGSD_VCF)".SVsFst_"$POP1"_"$POP2".vcf.gz"
 
 
-MATCHED_SV="$VCF_DIR/SVs/merged_SUPP2_MAF0.05_FMISS0.5_matched_offset5bp.txt"
+MATCHED_SV="$RAW_VCF_DIR/merged_SUPP2_MAF0.05_FMISS0.5_matched_offset5bp.txt" # this file is produced by the script compare_summarize_plot.sh from the gnotype_SVs_SRLR pipeline (https://github.com/LaurieLecomte/genotype_SVs_SRLR/blob/main/01_scripts/utils/compare_summarize_plot.sh)
 
 
 # LOAD REQUIRED MODULES
