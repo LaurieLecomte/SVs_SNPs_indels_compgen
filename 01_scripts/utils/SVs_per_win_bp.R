@@ -87,7 +87,7 @@ prop_plot <-
     }
   ) + 
   ylim(0, ifelse(test = max(bp_per_win$prop) > 0.2,
-                 yes = 0.75,
+                 yes = 0.8,
                  no = 0.2)) + 
   labs(x = expression(paste('Position (', 10^8, ' bp)' )),
        y = paste('Base pairs covered by', WIN_SIZE/1000000, 'Mb window'))
