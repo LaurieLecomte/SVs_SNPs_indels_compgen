@@ -61,3 +61,15 @@ ggplot(data = ALL_bp_win) +
 # +
 #geom_hline(yintercept = mean_fst$weighted_FST, col = 'red')
 
+
+# 3. Compute per win bp ratio between SVs and SNPs ------------------------
+# First merge both datasets together to get stats per window
+SVs_SNPs_bp_win <- merge(SVs_bp_win, SNPs_bp_win, by = c('CHROM_NUM', 'midBIN'), all = TRUE)
+
+# Compute ratio
+SVs_SNPs_bp_win$SVs_bp_to_SNPs_bp <- (SVs_SNPs_bp_win$prop.x / SVs_SNPs_bp_win$prop.y)
+
+# Compute mean ratio
+mean(SVs_SNPs_bp_win$SVs_bp_to_SNPs_bp, na.rm = TRUE)
+max(SVs_SNPs_bp_win$SVs_bp_to_SNPs_bp, na.rm = TRUE)
+min(SVs_SNPs_bp_win$SVs_bp_to_SNPs_bp, na.rm = TRUE)
