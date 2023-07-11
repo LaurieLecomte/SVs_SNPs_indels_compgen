@@ -51,7 +51,7 @@ CHR_BED="02_infos/chrs.bed"
 
 DENSITY_DIR="density/SVs"
 
-MATCHED_SV="$VCF_DIR/SVs/merged_SUPP2_MAF0.05_FMISS0.5_matched_offset5bp.txt"
+MATCHED_SV="$RAW_VCF_DIR/merged_SUPP2_MAF0.05_FMISS0.5_matched_offset5bp.txt"
 
 # LOAD REQUIRED MODULES
 module load vcftools/0.1.16

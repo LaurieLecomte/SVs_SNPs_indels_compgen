@@ -1,6 +1,7 @@
 # Compute proportion of bp covered by variant by window
 
 library(ggplot2)
+library(data.table)
 
 # 1. Access files in command line, import and format ----------------------
 argv <- commandArgs(T)
