@@ -20,10 +20,12 @@ OV_2_sasa <- read.table(OV_2_SSA, col.names = c('CHROM_OV', 'CHROM_SSA'))
 OV_2_sasa$CHROM_NUM <- sapply(X = OV_2_sasa$CHROM_SSA, FUN = function(x){
   unlist(strsplit(x, split = 'ssa'))[2]}
 )
-## add info on acro vs metacentric chromosomes
-OV_2_sasa$CHROM_TYPE <- ifelse(OV_2_sasa$CHROM_SSA %in% c('ssa01-23', paste0('ssa0', seq(2,8))),
-                               yes = 'meta',
-                               no = 'acro')
+
+## Add info on chrom type ### NOT USED, we do not know each chrom's type
+#meta <- c()
+#OV_2_ssa$CHROM_TYPE <- ifelse(OV_2_ssa$CHROM_SSA %in% meta,
+#                               yes = 'meta',
+#                               no = 'acro')
 
 var_density_OV <- merge(x = var_density, y = OV_2_sasa, by.x = 'CHROM', by.y = 'CHROM_OV', sort = FALSE)
 
@@ -64,63 +66,65 @@ saveRDS(density_plot, file = paste0(unlist(strsplit(DENSITY_TABLE, split = '.txt
 jpeg(file = paste0(unlist(strsplit(DENSITY_TABLE, split = '.txt')), '_plot.jpg'))
 density_plot
 dev.off()
+ggsave(density_plot, filename = paste0(unlist(strsplit(DENSITY_TABLE, split = '.txt')), '_density_plot.jpg'), 
+       width = 10, height = 4)
 
 # meta vs centro
-acro <- subset(var_density_OV, CHROM_TYPE == 'acro')
-density_plot_chr_acro <-
-  ggplot(data = acro) + 
-  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
-  geom_point(aes(x = BIN_MIDDLE, y = DENSITY), size = 0.8, alpha = 0.8,
-             col = 'firebrick') +
-  theme(panel.spacing = unit(0.1, 'points'),
-        strip.text.x = element_text(size = 6),
-        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
-        panel.background = element_rect(color = "gray70"),
-        strip.placement = "inside",
-        strip.background = element_rect(colour = 'gray70'),
-        legend.position = 'bottom'
-  ) + 
-  scale_x_continuous(
-    labels = function(x) {
-      round(x/10^8, 1)
-    }
-  ) + 
-  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
-       y = paste('Density by', WIN_SIZE/1000000, 'Mb window')) 
+#acro <- subset(var_density_OV, CHROM_TYPE == 'acro')
+#density_plot_chr_acro <-
+#  ggplot(data = acro) + 
+#  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
+#  geom_point(aes(x = BIN_MIDDLE, y = DENSITY), size = 0.8, alpha = 0.8,
+#             col = 'firebrick') +
+#  theme(panel.spacing = unit(0.1, 'points'),
+#        strip.text.x = element_text(size = 6),
+#        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
+#        panel.background = element_rect(color = "gray70"),
+#        strip.placement = "inside",
+#        strip.background = element_rect(colour = 'gray70'),
+#        legend.position = 'bottom'
+#  ) + 
+#  scale_x_continuous(
+#    labels = function(x) {
+#      round(x/10^8, 1)
+#    }
+#  ) + 
+#  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
+#       y = paste('Density by', WIN_SIZE/1000000, 'Mb window')) 
 
-meta <- subset(var_density_OV, CHROM_TYPE == 'meta')
-density_plot_chr_meta <-
-  ggplot(data = meta) + 
-  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
-  geom_point(aes(x = BIN_MIDDLE, y = DENSITY), size = 0.8, alpha = 0.8,
-             col = 'blue') +
-  theme(panel.spacing = unit(0.1, 'points'),
-        strip.text.x = element_text(size = 6),
-        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
-        panel.background = element_rect(color = "gray70"),
-        strip.placement = "inside",
-        strip.background = element_rect(colour = 'gray70'),
-        legend.position = 'bottom'
-  ) + 
-  scale_x_continuous(
-    labels = function(x) {
-      round(x/10^8, 1)
-    }
-  ) + 
-  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
-       y = paste('Density by', WIN_SIZE/1000000, 'Mb window')) 
-
-
-library(ggpubr)
-density_plot_chr_type <- 
-  ggarrange(density_plot_chr_acro, 
-            density_plot_chr_meta, 
-            ncol = 1, nrow = 2, common.legend = TRUE, legend = 'bottom',
-            label.x = 0.05,
-            label.y = 0.8,
-            labels = list('acro', 'meta'))
-
-ggsave(density_plot_chr_type, filename = paste0(unlist(strsplit(DENSITY_TABLE, split = '.txt')), '_chr_type_plot.jpg'), width = 10, height = 6)
+#meta <- subset(var_density_OV, CHROM_TYPE == 'meta')
+#density_plot_chr_meta <-
+#  ggplot(data = meta) + 
+#  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
+#  geom_point(aes(x = BIN_MIDDLE, y = DENSITY), size = 0.8, alpha = 0.8,
+#             col = 'blue') +
+#  theme(panel.spacing = unit(0.1, 'points'),
+#        strip.text.x = element_text(size = 6),
+#        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
+#        panel.background = element_rect(color = "gray70"),
+#        strip.placement = "inside",
+#        strip.background = element_rect(colour = 'gray70'),
+#        legend.position = 'bottom'
+#  ) + 
+#  scale_x_continuous(
+#    labels = function(x) {
+#      round(x/10^8, 1)
+#    }
+#  ) + 
+#  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
+#       y = paste('Density by', WIN_SIZE/1000000, 'Mb window')) 
 
 
-saveRDS(density_plot_chr_type, file = paste0(unlist(strsplit(DENSITY_TABLE, split = '.txt')), '_chr_type_plot.rds'))
+#library(ggpubr)
+#density_plot_chr_type <- 
+#  ggarrange(density_plot_chr_acro, 
+#            density_plot_chr_meta, 
+#            ncol = 1, nrow = 2, common.legend = TRUE, legend = 'bottom',
+#            label.x = 0.05,
+#            label.y = 0.8,
+#            labels = list('acro', 'meta'))
+
+#ggsave(density_plot_chr_type, filename = paste0(unlist(strsplit(DENSITY_TABLE, split = '.txt')), '_chr_type_plot.jpg'), width = 10, height = 6)
+
+
+#saveRDS(density_plot_chr_type, file = paste0(unlist(strsplit(DENSITY_TABLE, split = '.txt')), '_chr_type_plot.rds'))#

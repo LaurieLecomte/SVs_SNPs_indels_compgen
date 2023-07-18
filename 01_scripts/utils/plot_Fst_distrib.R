@@ -42,9 +42,11 @@ OV_2_sasa$CHROM_NUM <- sapply(X = OV_2_sasa$CHROM_SSA, FUN = function(x){
   unlist(strsplit(x, split = 'ssa'))[2]}
   )
 
-OV_2_sasa$CHROM_TYPE <- ifelse(OV_2_sasa$CHROM_SSA %in% c('ssa01-23', paste0('ssa0', seq(2,8))),
-       yes = 'meta',
-       no = 'acro')
+## Add info on chrom type ### NOT USED, we do not know each chrom's type
+#meta <- c()
+#OV_2_ssa$CHROM_TYPE <- ifelse(OV_2_ssa$CHROM_SSA %in% meta,
+#                               yes = 'meta',
+#                               no = 'acro')
 
 
 fst_table <- merge(x = fst_table, y = OV_2_sasa, by.x = 'CHROM', by.y = 'CHROM_OV')
@@ -171,63 +173,63 @@ dev.off()
 
 
 # meta vs centro
-acro <- subset(fst_win, CHROM_TYPE == 'acro')
-fst_win_chr_acro <-
-  ggplot(data = acro) + 
-  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
-  geom_point(aes(x = midPOS, y = FST), size = 0.8, alpha = 0.6,
-             col = 'firebrick') +
-  theme(panel.spacing = unit(0.1, 'points'),
-        strip.text.x = element_text(size = 6),
-        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
-        panel.background = element_rect(color = "gray70"),
-        strip.placement = "inside",
-        strip.background = element_rect(colour = 'gray70'),
-        legend.position = 'bottom'
-  ) + 
-  scale_x_continuous(
-    labels = function(x) {
-      round(x/10^8, 1)
-    }
-  ) + 
-  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
-       y = paste('Fst by', WIN_SIZE/1000000, 'Mb window')) 
+#acro <- subset(fst_win, CHROM_TYPE == 'acro')
+#fst_win_chr_acro <-
+#  ggplot(data = acro) + 
+#  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
+#  geom_point(aes(x = midPOS, y = FST), size = 0.8, alpha = 0.6,
+#             col = 'firebrick') +
+#  theme(panel.spacing = unit(0.1, 'points'),
+#        strip.text.x = element_text(size = 6),
+#        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
+#        panel.background = element_rect(color = "gray70"),
+#        strip.placement = "inside",
+#        strip.background = element_rect(colour = 'gray70'),
+#        legend.position = 'bottom'
+#  ) + 
+#  scale_x_continuous(
+#    labels = function(x) {
+#      round(x/10^8, 1)
+#    }
+#  ) + 
+#  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
+#       y = paste('Fst by', WIN_SIZE/1000000, 'Mb window')) 
 
-meta <- subset(fst_win, CHROM_TYPE == 'meta')
-fst_win_chr_meta <-
-  ggplot(data = meta) + 
-  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
-  geom_point(aes(x = midPOS, y = FST), size = 0.8, alpha = 0.6,
-             col = 'blue') +
-  theme(panel.spacing = unit(0.1, 'points'),
-        strip.text.x = element_text(size = 6),
-        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
-        panel.background = element_rect(color = "gray70"),
-        strip.placement = "inside",
-        strip.background = element_rect(colour = 'gray70'),
-        legend.position = 'bottom'
-  ) + 
-  scale_x_continuous(
-    labels = function(x) {
-      round(x/10^8, 1)
-    }
-  ) + 
-  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
-       y = paste('Fst by', WIN_SIZE/1000000, 'Mb window')) 
-
-
-library(ggpubr)
-fst_win_plot_chr_type <- 
-  ggarrange(fst_win_chr_acro, 
-            fst_win_chr_meta, 
-            ncol = 1, nrow = 2, common.legend = TRUE, legend = 'bottom',
-            label.x = 0.05,
-            label.y = 0.8,
-            labels = list('acro', 'meta'))
-
-ggsave(fst_win_plot_chr_type, filename = paste0(unlist(strsplit(WIN_FST, split = '.txt')), '_chr_type_plot.jpg'), width = 10, height = 6)
+#meta <- subset(fst_win, CHROM_TYPE == 'meta')
+#fst_win_chr_meta <-
+#  ggplot(data = meta) + 
+#  facet_grid(.~CHROM_NUM, scales = 'free_x', space = 'free_x') +
+#  geom_point(aes(x = midPOS, y = FST), size = 0.8, alpha = 0.6,
+#             col = 'blue') +
+#  theme(panel.spacing = unit(0.1, 'points'),
+#        strip.text.x = element_text(size = 6),
+#        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
+#        panel.background = element_rect(color = "gray70"),
+#        strip.placement = "inside",
+#        strip.background = element_rect(colour = 'gray70'),
+#        legend.position = 'bottom'
+#  ) + 
+#  scale_x_continuous(
+#    labels = function(x) {
+#      round(x/10^8, 1)
+#    }
+#  ) + 
+#  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
+#       y = paste('Fst by', WIN_SIZE/1000000, 'Mb window')) 
 
 
-saveRDS(fst_win_plot_chr_type, file = paste0(unlist(strsplit(WIN_FST, split = '.txt')), '_chr_type_plot.rds'))
+#library(ggpubr)
+#fst_win_plot_chr_type <- 
+#  ggarrange(fst_win_chr_acro, 
+#            fst_win_chr_meta, 
+#            ncol = 1, nrow = 2, common.legend = TRUE, legend = 'bottom',
+#            label.x = 0.05,
+#            label.y = 0.8,
+#            labels = list('acro', 'meta'))
+
+#ggsave(fst_win_plot_chr_type, filename = paste0(unlist(strsplit(WIN_FST, split = '.txt')), '_chr_type_plot.jpg'), width = 10, height = 6)
+
+
+#saveRDS(fst_win_plot_chr_type, file = paste0(unlist(strsplit(WIN_FST, split = '.txt')), '_chr_type_plot.rds'))
 
 

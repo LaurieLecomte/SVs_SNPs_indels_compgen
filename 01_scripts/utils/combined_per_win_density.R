@@ -35,10 +35,11 @@ OV_2_ssa$CHROM_NUM <- sapply(X = OV_2_ssa$CHROM_SSA, FUN = function(x){
   unlist(strsplit(x, split = 'ssa'))[2]}
 )
 
-## add info on acro vs metacentric chromosomes
-OV_2_ssa$CHROM_TYPE <- ifelse(OV_2_ssa$CHROM_SSA %in% c('ssa01-23', paste0('ssa0', seq(2,8))),
-                               yes = 'meta',
-                               no = 'acro')
+## Add info on chrom type ### NOT USED, we do not know each chrom's type
+#meta <- c()
+#OV_2_ssa$CHROM_TYPE <- ifelse(OV_2_ssa$CHROM_SSA %in% meta,
+#                               yes = 'meta',
+#                               no = 'acro')
 
 ## merge with full dataset
 ALL_dens_win <- merge(x = ALL_dens_win, y = OV_2_ssa, 
@@ -81,68 +82,68 @@ ggplot(data = ALL_dens_win) +
        y = paste('Density by', WIN_SIZE / 1000000, 'Mb window'))
 
   
-  # meta vs centro
-acro <- subset(ALL_dens_win, CHROM_TYPE == 'acro')
-#density_plot_chr_acro <-
-  ggplot(data = acro) +
-  facet_grid(factor(TYPE, levels = c('SVs', 'SNPs', 'indels')) ~ CHROM_NUM, 
-             scales = 'free', space = 'free_x') +
-  geom_point(
-    aes(x = midBIN, y = DENSITY),
-    size = 0.8,
-    alpha = 0.8,
-    col = 'darkorange3'
-  ) +
-  theme(
-    panel.spacing = unit(0.1, 'points'),
-    strip.text.x = element_text(size = 6),
-    axis.text.x = element_text(
-      angle = 45,
-      size = 4,
-      hjust = 1
-    ),
-    panel.background = element_rect(color = "gray70"),
-    strip.placement = "inside",
-    strip.background = element_rect(colour = 'gray70'),
-    legend.position = 'bottom'
-  ) +
-  scale_x_continuous(
-    labels = function(x) {
-      round(x / 10 ^ 8, 1)
-    }
-  ) +
-  labs(x = expression(paste('Position (', 10 ^ 8, ' bp)')),
-       y = paste('Density by', WIN_SIZE / 1000000, 'Mb window'))
+# meta vs centro
+#acro <- subset(ALL_dens_win, CHROM_TYPE == 'acro')
+##density_plot_chr_acro <-
+#  ggplot(data = acro) +
+#  facet_grid(factor(TYPE, levels = c('SVs', 'SNPs', 'indels')) ~ CHROM_NUM, 
+#             scales = 'free', space = 'free_x') +
+#  geom_point(
+#    aes(x = midBIN, y = DENSITY),
+#    size = 0.8,
+#    alpha = 0.8,
+#    col = 'darkorange3'
+#  ) +
+#  theme(
+#    panel.spacing = unit(0.1, 'points'),
+#    strip.text.x = element_text(size = 6),
+#    axis.text.x = element_text(
+#      angle = 45,
+#      size = 4,
+#      hjust = 1
+#    ),
+#    panel.background = element_rect(color = "gray70"),
+#    strip.placement = "inside",
+#    strip.background = element_rect(colour = 'gray70'),
+#    legend.position = 'bottom'
+#  ) +
+#  scale_x_continuous(
+#    labels = function(x) {
+#      round(x / 10 ^ 8, 1)
+#    }
+#  ) +
+#  labs(x = expression(paste('Position (', 10 ^ 8, ' bp)')),
+#       y = paste('Density by', WIN_SIZE / 1000000, 'Mb window'))
 
-meta <- subset(ALL_dens_win, CHROM_TYPE == 'meta')
-#density_plot_chr_meta <-
-  ggplot(data = meta) +
-  facet_grid(. ~ CHROM_NUM, scales = 'free_x', space = 'free_x') +
-  geom_point(
-    aes(x = midBIN, y = DENSITY),
-    size = 0.8,
-    alpha = 0.8,
-    col = 'magenta4'
-  ) +
-  theme(
-    panel.spacing = unit(0.1, 'points'),
-    strip.text.x = element_text(size = 6),
-    axis.text.x = element_text(
-      angle = 45,
-      size = 4,
-      hjust = 1
-    ),
-    panel.background = element_rect(color = "gray70"),
-    strip.placement = "inside",
-    strip.background = element_rect(colour = 'gray70'),
-    legend.position = 'bottom'
-  ) +
-  scale_x_continuous(
-    labels = function(x) {
-      round(x / 10 ^ 8, 1)
-    }
-  ) +
-  labs(x = expression(paste('Position (', 10 ^ 8, ' bp)')),
-       y = paste('Density by', WIN_SIZE / 1000000, 'Mb window')) 
+#meta <- subset(ALL_dens_win, CHROM_TYPE == 'meta')
+##density_plot_chr_meta <-
+#  ggplot(data = meta) +
+#  facet_grid(. ~ CHROM_NUM, scales = 'free_x', space = 'free_x') +
+#  geom_point(
+#    aes(x = midBIN, y = DENSITY),
+#    size = 0.8,
+#    alpha = 0.8,
+#    col = 'magenta4'
+#  ) +
+#  theme(
+#    panel.spacing = unit(0.1, 'points'),
+#    strip.text.x = element_text(size = 6),
+#    axis.text.x = element_text(
+#      angle = 45,
+#      size = 4,
+#      hjust = 1
+#    ),
+#    panel.background = element_rect(color = "gray70"),
+#    strip.placement = "inside",
+#    strip.background = element_rect(colour = 'gray70'),
+#    legend.position = 'bottom'
+#  ) +
+#  scale_x_continuous(
+#    labels = function(x) {
+#      round(x / 10 ^ 8, 1)
+#    }
+#  ) +
+#  labs(x = expression(paste('Position (', 10 ^ 8, ' bp)')),
+#       y = paste('Density by', WIN_SIZE / 1000000, 'Mb window')) 
   
   

@@ -20,9 +20,13 @@ OV_2_sasa$CHROM_NUM <- sapply(X = OV_2_sasa$CHROM_SSA, FUN = function(x){
   unlist(strsplit(x, split = 'ssa'))[2]}
 )
 
-OV_2_sasa$CHROM_TYPE <- ifelse(OV_2_sasa$CHROM_SSA %in% c('ssa01-23', paste0('ssa0', seq(2,8))),
-                               yes = 'meta',
-                               no = 'acro')
+
+## Add info on chrom type ### NOT USED, we do not know each chrom's type
+#meta <- c()
+#OV_2_ssa$CHROM_TYPE <- ifelse(OV_2_ssa$CHROM_SSA %in% meta,
+#                               yes = 'meta',
+#                               no = 'acro') 
+
 win_table <- merge(x = win_table, y = OV_2_sasa, by.x = 'CHROM', by.y = 'CHROM_OV')
 
 
