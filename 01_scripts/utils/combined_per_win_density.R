@@ -57,30 +57,50 @@ ggplot(data = ALL_dens_win) +
              space = 'free_x') +
   geom_point(
     aes(x = midBIN, y = DENSITY),
-    size = 0.8,
-    alpha = 0.5,
-    col = 'darkblue'
+    size = 0.3,
+    col = 'midnightblue'
   ) +
-  theme(
-    panel.spacing = unit(0.1, 'points'),
-    strip.text.x = element_text(size = 6),
-    axis.text.x = element_text(
-      angle = 45,
-      size = 4,
-      hjust = 1
-    ),
-    panel.background = element_rect(color = "gray70"),
-    strip.placement = "inside",
-    strip.background = element_rect(colour = 'gray70')
+  theme(panel.spacing.x = unit(0.2, 'points'),
+        panel.spacing.y = unit(2, 'points'),
+        strip.text.x.top = element_text(size = 4,
+                                        margin = margin(3,0,3,0, 'pt')),
+        strip.text.y.right = element_text(size = 5,
+                                          margin = margin(0,3,0,3, 'pt')),
+        strip.placement = "inside",
+        strip.background = element_rect(colour = 'gray70'),
+        
+        
+        axis.text.x = element_text(angle = 45, size = 3, hjust = 1),
+        axis.text.y = element_text(size = 4),
+        axis.title.x = element_text(size = 7),
+        axis.title.y = element_text(size = 7),
+        axis.ticks.x = element_line(linewidth = 0.2),
+        axis.ticks.y = element_line(linewidth = 0.3),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(linewidth = 0.2),
+        panel.grid.minor.y = element_line(linewidth = 0.2),
+        panel.grid.major.y = element_line(linewidth = 0.3),
+        panel.background = element_rect(color = "gray70")
+        
   ) +
   scale_x_continuous(
+    breaks = seq(0, 1.6*(10^8), by = (0.4*10^8)),
     labels = function(x) {
-      round(x / 10 ^ 8, 1)
+      round(x / 10^8, 1)
     }
   ) +
   labs(x = expression(paste('Position (', 10 ^ 8, ' bp)')),
-       y = paste('Density by', WIN_SIZE / 1000000, 'Mb window'))
+       #y = paste('Density by', WIN_SIZE / 1000000, 'Mb window'))
+       y = 'Variant density'
+  )
 
+# Save to external file
+ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/density/combined_per_win_density.png',
+       width = 2800,
+       height = 3100,
+       units = 'px',
+       dpi = 600
+)
   
 # meta vs centro
 #acro <- subset(ALL_dens_win, CHROM_TYPE == 'acro')

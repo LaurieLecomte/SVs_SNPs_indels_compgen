@@ -1,6 +1,7 @@
 # Plot per window proportion of bp covered, for SVs, SNPs and indels together
 
 library(ggplot2)
+library(scales)
 
 # 1. Import and format ----------------------------------------------------
 ## These files were produced by scripts XX_per_win_bp_prop.sh
@@ -40,27 +41,50 @@ ggplot(data = ALL_bp_win) +
              scales = 'free', space = 'free_x') +
   geom_point(aes(x = midBIN, y = prop),
              #alpha = 1.5 * ALL_bp_win$prop, 
-             size = 1.2*ALL_bp_win$prop, 
-             col = 'darkblue') +
-  theme(panel.spacing = unit(0.2, 'points'),
-        strip.text.x = element_text(size = 5),
-        axis.text.x = element_text(angle = 45, size = 4, hjust = 1),
-        axis.text.y = element_text(size = 8),
-        panel.background = element_rect(color = "gray70"),
+             size = 0.3, 
+             col = 'midnightblue') +
+  theme(panel.spacing.x = unit(0.2, 'points'),
+        panel.spacing.y = unit(2, 'points'),
+        strip.text.x.top = element_text(size = 4,
+                                        margin = margin(3,0,3,0, 'pt')),
+        strip.text.y.right = element_text(size = 5,
+                                          margin = margin(0,3,0,3, 'pt')),
         strip.placement = "inside",
-        strip.background = element_rect(colour = 'gray70')
+        strip.background = element_rect(colour = 'gray70'),
+        
+      
+        axis.text.x = element_text(angle = 45, size = 3, hjust = 1),
+        axis.text.y = element_text(size = 4),
+        axis.title.x = element_text(size = 7),
+        axis.title.y = element_text(size = 7),
+        axis.ticks.x = element_line(linewidth = 0.2),
+        axis.ticks.y = element_line(linewidth = 0.3),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(linewidth = 0.2),
+        panel.grid.minor.y = element_line(linewidth = 0.2),
+        panel.grid.major.y = element_line(linewidth = 0.3),
+        panel.background = element_rect(color = "gray70")
+        
   ) + 
+  scale_y_continuous(labels = number_format(accuracy = 0.001)) +
   scale_x_continuous(
+    breaks = seq(0, 1.6*(10^8), by = (0.4*10^8)),
     labels = function(x) {
       round(x/10^8, 1)
     }
   ) + 
   labs(x = expression(paste('Position (', 10^8, ' bp)' )),
        y = 'Proportion of base pairs covered') + 
-  guides(color = FALSE)
-# +
-#geom_hline(yintercept = mean_fst$weighted_FST, col = 'red')
+  guides(color = 'none')
 
+
+# Save to external file
+ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/density/combined_per_win_bp_covered.png',
+       width = 2800,
+       height = 3100,
+       units = 'px',
+       dpi = 600
+)
 
 # 3. Compute per win bp ratio between SVs and SNPs ------------------------
 # First merge both datasets together to get stats per window
