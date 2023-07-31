@@ -38,13 +38,31 @@ ggplot(data = ALL_FMISS) +
   #facet_grid(.~factor(TYPE, levels = c('SVs', 'SNPs', 'indels')), 
   facet_grid(factor(TYPE, levels = c('SVs', 'SNPs', 'Indels')) ~ ., 
              scales = 'free_y') +
-  geom_bar(aes(F_MISS_bins, fill = F_MISS_groups)) + 
+  geom_bar(aes(F_MISS_bins, fill = F_MISS_groups), color = 'black', linewidth = 0.1) + 
   theme(
-    axis.text.x = element_text(angle = 45, size = 8, hjust = 1)
+    ## Axis
+    axis.text.x = element_text(angle = 45, size = 6, hjust = 1),
+    axis.text.y = element_text(size = 6, hjust = 1),
+    axis.title.x = element_text(size = 8),
+    axis.title.y = element_text(size = 8),
+    strip.text.y.right = element_text(size = 7),
+    ## Legend
+    legend.title = element_text(size = 8, hjust = 0.5),
+    legend.text = element_text(size = 7),
+    legend.key.size = unit(5, 'mm')
+    
   ) + scale_fill_manual(values = c('red', 'grey60')) +
   labs(x = 'Proportion of missing genotypes',
        y = 'Count',
        fill = 'F_MISSING filter') +
-  theme(legend.title = element_text(size = 10), 
-        legend.text = element_text(size = 10)) +
-  guides(color = guide_legend(override.aes = list(size = 0.5)))
+  guides(color = guide_legend(override.aes = list(size = 0.5))) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE))
+
+# Save to external file
+ggsave(filename = "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/FMISS_plot_by_type.png", 
+       width = 2600,
+       height = 2800,
+       units = 'px',
+       dpi = 600
+)
+
