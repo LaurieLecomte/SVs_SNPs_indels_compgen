@@ -99,7 +99,7 @@ ggplot(data = ALL_Fst_win) +
             aes(y = mean_Fst + 0.03, 
                 x = 45000000, 
             label = mean_Fst),
-            size = 1.3, color = 'white')
+            size = 1.4, color = 'white')
   
   
 # Save to external file
@@ -107,5 +107,5 @@ ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_
        width = 2800,
        height = 3100,
        units = 'px',
-       dpi = 600
+       dpi = 700
 )

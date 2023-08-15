@@ -99,7 +99,7 @@ ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_
        width = 2800,
        height = 3100,
        units = 'px',
-       dpi = 600
+       dpi = 700
 )
   
 # meta vs centro

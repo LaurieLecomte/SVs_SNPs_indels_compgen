@@ -33,8 +33,11 @@ ALL_bp_win <- do.call("rbind", list(SVs_bp_win, SNPs_bp_win, indels_bp_win))
 
 
 
-
 # 2. Plot  ----------------------------------------------------------------
+# Create a df for labelling panels
+label_df <- data.frame('TYPE' = c('SVs', 'SNPs', 'indels'), 'label' = c('A', 'B', 'C'), 'CHROM_NUM' = names(table(ALL_bp_win$CHROM_NUM)[28]))
+
+plot_bp <-
 ggplot(data = ALL_bp_win) +
   #facet_wrap(~ CHROM_SSA, nrow = 2, scales = 'free_x') +
   facet_grid(factor(TYPE, levels = c('SVs', 'SNPs', 'indels')) ~ CHROM_NUM, 
@@ -47,10 +50,12 @@ ggplot(data = ALL_bp_win) +
         panel.spacing.y = unit(2, 'points'),
         strip.text.x.top = element_text(size = 4,
                                         margin = margin(3,0,3,0, 'pt')),
-        strip.text.y.right = element_text(size = 5,
-                                          margin = margin(0,3,0,3, 'pt')),
-        strip.placement = "inside",
-        strip.background = element_rect(colour = 'gray70'),
+        #strip.text.y.right = element_text(size = 5,
+        #                                  margin = margin(0,3,0,3, 'pt')),
+        strip.background.y = element_blank(),
+        strip.text.y.right = element_blank(),
+        #strip.placement = "inside",
+        strip.background.x = element_rect(colour = 'gray70'),
         
       
         axis.text.x = element_text(angle = 45, size = 3, hjust = 1),
@@ -66,7 +71,7 @@ ggplot(data = ALL_bp_win) +
         panel.background = element_rect(color = "gray70")
         
   ) + 
-  scale_y_continuous(labels = number_format(accuracy = 0.001)) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.001)) +
   scale_x_continuous(
     breaks = seq(0, 1.6*(10^8), by = (0.4*10^8)),
     labels = function(x) {
@@ -77,13 +82,19 @@ ggplot(data = ALL_bp_win) +
        y = 'Proportion of base pairs covered') + 
   guides(color = 'none')
 
-
+## Add labels
+plot_bp + geom_text(
+  data    = label_df,
+  mapping = aes(x = 0.4*(10^8), y = Inf, label = label),
+  vjust   = 1.2,
+  size = 5
+)
 # Save to external file
 ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/density/combined_per_win_bp_covered.png',
        width = 2800,
        height = 3100,
        units = 'px',
-       dpi = 600
+       dpi = 700
 )
 
 # 3. Compute per win bp ratio between SVs and SNPs ------------------------
