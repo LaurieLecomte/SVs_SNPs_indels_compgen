@@ -106,20 +106,20 @@ less $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_overlap"$OVERLAP_WIN"bp
 
 # With bedtools intersect
 # with intersect
-bedtools intersect -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers.table > $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect.table
-echo "$(less $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) overlapping a RDA candidate indel"
+#bedtools intersect -a $ANNOT_TABLE -b $RDA_DIR/RDA_"$SD"sd_outliers.table > $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect.table
+#echo "$(less $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect.table | cut -f1,5 | sort | uniq | wc -l) unique genes (or duplicated genes on different chromosomes) overlapping a RDA candidate indel"
 
-less $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect.table | cut -f5 | sort | uniq > $GO_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect_outlierIDs.txt
+#less $RDA_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect.table | cut -f5 | sort | uniq > $GO_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect_outlierIDs.txt
 
-python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
-  --obo $GO_DB \
-  $GO_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect_outlierIDs.txt \
-  $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt \
-  $GO_ANNOT --min_overlap 0.1 \
-  --outfile $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.csv
+#python 12_go/goatools/scripts/find_enrichment.py --pval=0.05 --indent \
+#  --obo $GO_DB \
+#  $GO_DIR/indels_"$POP1"_"$POP2"_outliers_RDA_"$SD"sd_intersect_outlierIDs.txt \
+#  $GO_DIR/"$(basename -s .tsv $GENOME_ANNOT)".background.IDs.txt \
+#  $GO_ANNOT --min_overlap 0.1 \
+#  --outfile $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.csv
   
-Rscript 01_scripts/utils/filter_GO.R $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.csv $MAX_FDR $MIN_LEVEL
+#Rscript 01_scripts/utils/filter_GO.R $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.csv $MAX_FDR $MIN_LEVEL
 
-less $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt
+#less $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".csv | cut -f1,4-6,8,13 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt
 
-less $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt | tail -n+2 | cut -f1,6 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".GO_pval.txt
+#less $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".simpl.txt | tail -n+2 | cut -f1,6 | perl -pe 's/^[.]+(GO\:[0-9\.e\-]+)/\1/' > $GO_DIR/indels_"$POP1"_"$POP2"_RDA_"$SD"sd_outliers_intersect_GO.fdr"$MAX_FDR"_depth"$MIN_LEVEL".GO_pval.txt
