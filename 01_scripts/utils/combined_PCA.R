@@ -105,12 +105,17 @@ SVs_PC1_PC2 <-
     legend.title = element_text(size = 8, hjust = 0.5),
     legend.text = element_text(size = 6),
     legend.key.size = unit(5, 'mm'),
+    legend.key = element_rect(color = 'black', fill = 'white', linewidth = 0.1),
     ## Background
-    panel.background = element_rect(fill = 'gray95'),
-    panel.grid.minor.x = element_line(linewidth = 0.3),
-    panel.grid.major.x = element_line(linewidth = 0.4),
-    panel.grid.minor.y = element_line(linewidth = 0.3),
-    panel.grid.major.y = element_line(linewidth = 0.4)
+    #panel.background = element_rect(fill = 'gray95'),
+    #panel.grid.minor.x = element_line(linewidth = 0.3),
+    #panel.grid.major.x = element_line(linewidth = 0.4),
+    #panel.grid.minor.y = element_line(linewidth = 0.3),
+    #panel.grid.major.y = element_line(linewidth = 0.4),
+  
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = 0.2),
+    panel.grid = element_blank(),
   )
 
 SNPs_PC1_PC2 <- 
@@ -140,12 +145,16 @@ SNPs_PC1_PC2 <-
     legend.title = element_text(size = 8, hjust = 0.5),
     legend.text = element_text(size = 6),
     legend.key.size = unit(5, 'mm'),
+    legend.key = element_rect(color = 'black', fill = 'white', linewidth = 0.1),
     ## Background
-    panel.background = element_rect(fill = 'gray95'),
-    panel.grid.minor.x = element_line(linewidth = 0.3),
-    panel.grid.major.x = element_line(linewidth = 0.4),
-    panel.grid.minor.y = element_line(linewidth = 0.3),
-    panel.grid.major.y = element_line(linewidth = 0.4)
+    #panel.background = element_rect(fill = 'gray95'),
+    #panel.grid.minor.x = element_line(linewidth = 0.3),
+    #panel.grid.major.x = element_line(linewidth = 0.4),
+    #panel.grid.minor.y = element_line(linewidth = 0.3),
+    #panel.grid.major.y = element_line(linewidth = 0.4),
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = 0.2),
+    panel.grid = element_blank(),
   )
 
 
@@ -176,12 +185,16 @@ indels_PC1_PC2 <-
     legend.title = element_text(size = 8, hjust = 0.5),
     legend.text = element_text(size = 6),
     legend.key.size = unit(5, 'mm'),
+    legend.key = element_rect(color = 'black', fill = 'white', linewidth = 0.1),
     ## Background
-    panel.background = element_rect(fill = 'gray95'),
-    panel.grid.minor.x = element_line(linewidth = 0.3),
-    panel.grid.major.x = element_line(linewidth = 0.4),
-    panel.grid.minor.y = element_line(linewidth = 0.3),
-    panel.grid.major.y = element_line(linewidth = 0.4)
+    #panel.background = element_rect(fill = 'gray95'),
+    #panel.grid.minor.x = element_line(linewidth = 0.3),
+    #panel.grid.major.x = element_line(linewidth = 0.4),
+    #panel.grid.minor.y = element_line(linewidth = 0.3),
+    #panel.grid.major.y = element_line(linewidth = 0.4)
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = 0.2),
+    panel.grid = element_blank(),
   )
 
 
@@ -197,6 +210,16 @@ ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_
        width = 3000,
        height = 1400,
        units = 'px',
-       dpi = 600,
+       dpi = 700,
        bg = "white"
+)
+
+# Save to external file
+ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/09_pca/combined_PCA.pdf',
+       width = 3000,
+       height = 1400,
+       units = 'px',
+       dpi = 700,
+       bg = "white",
+       device = 'pdf'
 )

@@ -60,15 +60,16 @@ ggplot(data = ALL_dens_win) +
     size = 0.3,
     col = 'midnightblue'
   ) +
-  theme(panel.spacing.x = unit(0.2, 'points'),
+  theme(panel.spacing.x = unit(0, 'points'),
         panel.spacing.y = unit(2, 'points'),
         strip.text.x.top = element_text(size = 4,
                                         margin = margin(3,0,3,0, 'pt')),
         strip.text.y.right = element_text(size = 5,
                                           margin = margin(0,3,0,3, 'pt')),
-        strip.placement = "inside",
-        strip.background = element_rect(colour = 'gray70'),
+        strip.background.y = element_rect(color = 'grey80', linewidth = 0.1),
         
+        #strip.placement = "inside",
+        strip.background.x = element_rect(colour = 'grey80', linewidth = 0.1),
         
         axis.text.x = element_text(angle = 45, size = 3, hjust = 1),
         axis.text.y = element_text(size = 4),
@@ -76,11 +77,16 @@ ggplot(data = ALL_dens_win) +
         axis.title.y = element_text(size = 7),
         axis.ticks.x = element_line(linewidth = 0.2),
         axis.ticks.y = element_line(linewidth = 0.3),
-        panel.grid.minor.x = element_blank(),
-        panel.grid.major.x = element_line(linewidth = 0.2),
-        panel.grid.minor.y = element_line(linewidth = 0.2),
-        panel.grid.major.y = element_line(linewidth = 0.3),
-        panel.background = element_rect(color = "gray70")
+        #panel.grid.minor.x = element_blank(),
+        #panel.grid.major.x = element_line(linewidth = 0.2),
+        #panel.grid.minor.y = element_line(linewidth = 0.2),
+        panel.grid.major.y = element_line(linewidth = 0.1, color = 'grey80'),
+        
+        ## Background
+        panel.background = element_blank(),
+        panel.border = element_rect(color = 'grey80', fill = NA, linewidth = 0.1),
+        panel.grid = element_blank(),
+        #panel.grid.major.y = element_line(linewidth = 0.1, color = "black" )
         
   ) +
   scale_x_continuous(
@@ -101,7 +107,15 @@ ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_
        units = 'px',
        dpi = 700
 )
-  
+
+# Save to external file
+ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/density/combined_per_win_density.pdf',
+       width = 2800,
+       height = 3100,
+       units = 'px',
+       dpi = 700,
+       device = 'pdf'
+)
 # meta vs centro
 #acro <- subset(ALL_dens_win, CHROM_TYPE == 'acro')
 ##density_plot_chr_acro <-
