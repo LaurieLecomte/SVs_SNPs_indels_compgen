@@ -4,7 +4,7 @@
 
 # srun -p small -c 3 -J LD_SVs_SNPs_plink -o log/LD_SVs_SNPs_plink_%j.log /bin/sh 01_scripts/utils/LD_SVs_SNPs_plink.sh &
 
-# srun -p small -c 5 --mem=50G -J LD_SVs_SNPs_plink -o log/LD_SVs_SNPs_plink_%j.log /bin/sh 01_scripts/utils/LD_SVs_SNPs_plink.sh &
+# srun -p small -c 3 --mem=100G -J LD_SVs_SNPs_plink -o log/LD_SVs_SNPs_plink_%j.log /bin/sh 01_scripts/utils/LD_SVs_SNPs_plink.sh &
 
 # parallel -a 02_infos/chr_list.txt -j 10 srun -p small -c 3 -J LD_SVs_SNPs_plink_{} -o log/LD_SVs_SNPs_plink_{}_%j.log /bin/sh 01_scripts/utils/LD_SVs_SNPs_plink.sh {} &
 
@@ -56,17 +56,17 @@ MAX_WIDTH=200
 #Rscript 01_scripts/utils/recode_SVs_fromVCF.R $SV_VCF $VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf $MAX_WIDTH
 
 #bgzip $VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf 
-tabix -p vcf $VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf.gz 
+#tabix -p vcf $VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf.gz 
 
 # Concatenate SVs and SNPs
-echo -e "$VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf.gz\n$SNP_VCF" > $LD_DIR/LD_SVs_SNPs_list.txt
+#echo -e "$VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf.gz\n$SNP_VCF" > $LD_DIR/LD_SVs_SNPs_list.txt
 
-bcftools concat -f $LD_DIR/LD_SVs_SNPs_list.txt --threads $CPU -a | bcftools sort -Oz > $LD_DIR/SVs_SNPs_concat.vcf.gz
+#bcftools concat -f $LD_DIR/LD_SVs_SNPs_list.txt --threads $CPU -a | bcftools sort -Oz > $LD_DIR/SVs_SNPs_concat.vcf.gz
 
 
-WIN_KB=10000
+WIN_KB=1000
 
-plink --r2 --allow-extra-chr --ld-window-kb $WIN_KB --ld-window-r2 0 --vcf $LD_DIR/SVs_SNPs_concat.vcf.gz --threads $CPU --out $LD_DIR/SVs_SNPs_concat_"$WIN_KB"
+plink --r2 --allow-extra-chr --ld-window 99999 --ld-window-kb $WIN_KB --ld-window-r2 0 --vcf $LD_DIR/SVs_SNPs_concat.vcf.gz --threads $CPU --out $LD_DIR/SVs_SNPs_concat_"$WIN_KB"
 
 
 
