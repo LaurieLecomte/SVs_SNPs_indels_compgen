@@ -34,69 +34,113 @@ ALL_bp_win <- do.call("rbind", list(SVs_bp_win, SNPs_bp_win, indels_bp_win))
 
 
 # 2. Plot  ----------------------------------------------------------------
+#ggplot(data = ALL_bp_win) +
+#  #facet_wrap(~ CHROM_SSA, nrow = 2, scales = 'free_x') +
+#  facet_grid(factor(TYPE, levels = c('SVs', 'SNPs', 'indels')) ~ CHROM_NUM, 
+#             scales = 'free', space = 'free_x') +
+#  geom_point(aes(x = midBIN, y = prop),
+#             #alpha = 1.5 * ALL_bp_win$prop, 
+#             size = 0.3, 
+#             col = 'midnightblue') +
+#  theme(panel.spacing.x = unit(0, 'points'),
+#        panel.spacing.y = unit(2, 'points'),
+#        strip.text.x.top = element_text(size = 4,
+#                                        margin = margin(3,0,3,0, 'pt')),
+#        strip.text.y.right = element_text(size = 5,
+#                                          margin = margin(0,3,0,3, 'pt')),
+#        strip.background.y = element_rect(color = 'grey80', linewidth = 0.1),
+#        
+#        #strip.placement = "inside",
+#        strip.background.x = element_rect(colour = 'grey80', linewidth = 0.1),
+#      
+#        axis.text.x = element_text(angle = 45, size = 3, hjust = 1),
+#        axis.text.y = element_text(size = 4),
+#        axis.title.x = element_text(size = 7),
+#        axis.title.y = element_text(size = 7),
+#        axis.ticks.x = element_line(linewidth = 0.2),
+#        axis.ticks.y = element_line(linewidth = 0.3),
+#        #panel.grid.minor.x = element_blank(),
+#        #panel.grid.major.x = element_line(linewidth = 0.2),
+#        #panel.grid.minor.y = element_line(linewidth = 0.2),
+#        panel.grid.major.y = element_line(linewidth = 0.1, color = 'grey80'),
+#        
+#        ## Background
+#        panel.background = element_blank(),
+#        panel.border = element_rect(color = 'grey80', fill = NA, linewidth = 0.1),
+#        panel.grid = element_blank(),
+#        #panel.grid.major.y = element_line(linewidth = 0.1, color = "black" )
+#        
+#  ) + 
+#  scale_y_continuous(labels = scales::number_format(accuracy = 0.001)) +
+#  scale_x_continuous(
+#    breaks = seq(0, 1.6*(10^8), by = (0.4*10^8)),
+#    labels = function(x) {
+#      round(x/10^8, 1)
+#    }
+#  ) + 
+#  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
+#       y = 'Proportion of base pairs covered') + 
+#  guides(color = 'none')
+
 ggplot(data = ALL_bp_win) +
-  #facet_wrap(~ CHROM_SSA, nrow = 2, scales = 'free_x') +
   facet_grid(factor(TYPE, levels = c('SVs', 'SNPs', 'indels')) ~ CHROM_NUM, 
              scales = 'free', space = 'free_x') +
-  geom_point(aes(x = midBIN, y = prop),
+  geom_point(aes(x = midBIN, y = prop, color = CHROM_NUM),
              #alpha = 1.5 * ALL_bp_win$prop, 
-             size = 0.3, 
-             col = 'midnightblue') +
-  theme(panel.spacing.x = unit(0, 'points'),
-        panel.spacing.y = unit(2, 'points'),
-        strip.text.x.top = element_text(size = 4,
-                                        margin = margin(3,0,3,0, 'pt')),
-        strip.text.y.right = element_text(size = 5,
-                                          margin = margin(0,3,0,3, 'pt')),
-        strip.background.y = element_rect(color = 'grey80', linewidth = 0.1),
-        
-        #strip.placement = "inside",
-        strip.background.x = element_rect(colour = 'grey80', linewidth = 0.1),
-      
-        axis.text.x = element_text(angle = 45, size = 3, hjust = 1),
-        axis.text.y = element_text(size = 4),
-        axis.title.x = element_text(size = 7),
-        axis.title.y = element_text(size = 7),
-        axis.ticks.x = element_line(linewidth = 0.2),
-        axis.ticks.y = element_line(linewidth = 0.3),
-        #panel.grid.minor.x = element_blank(),
-        #panel.grid.major.x = element_line(linewidth = 0.2),
-        #panel.grid.minor.y = element_line(linewidth = 0.2),
-        panel.grid.major.y = element_line(linewidth = 0.1, color = 'grey80'),
-        
-        ## Background
-        panel.background = element_blank(),
-        panel.border = element_rect(color = 'grey80', fill = NA, linewidth = 0.1),
-        panel.grid = element_blank(),
-        #panel.grid.major.y = element_line(linewidth = 0.1, color = "black" )
-        
-  ) + 
+             size = 0.04) +
+  theme(
+    # Panels and background
+    panel.spacing.x = unit(0.6, 'points'),
+    panel.spacing.y = unit(3, 'points'),
+    panel.background = element_blank(),
+    panel.border = element_blank(),
+    panel.grid = element_blank(),
+    
+    # Strips
+    strip.text.x.top = element_text(size = 3, 
+                                    margin = margin(3,0,3,0, 'pt')),
+    strip.text.y.right = element_text(size = 4,
+                                      margin = margin(0,1,0,1, 'pt')),
+    strip.background.y = element_rect(color = 'black', linewidth = 0.1),
+    strip.background.x = element_rect(colour = 'black', linewidth = 0.1),
+    
+    # Axis
+    axis.text.x = element_blank(),
+    axis.text.y = element_text(size = 4),
+    axis.title.x = element_text(size = 7),
+    axis.title.y = element_text(size = 7),
+    axis.ticks.x = element_blank(),
+    axis.ticks.y = element_line(linewidth = 0.3),
+    axis.line.y = element_line(linewidth = 0.08),
+    axis.line.x = element_line(linewidth = 0.08)
+    
+    ) + 
+  
   scale_y_continuous(labels = scales::number_format(accuracy = 0.001)) +
-  scale_x_continuous(
-    breaks = seq(0, 1.6*(10^8), by = (0.4*10^8)),
-    labels = function(x) {
-      round(x/10^8, 1)
-    }
-  ) + 
-  labs(x = expression(paste('Position (', 10^8, ' bp)' )),
-       y = 'Proportion of base pairs covered') + 
-  guides(color = 'none')
-
+  
+  guides(color = 'none') +
+  
+  scale_color_manual(values = rep(c('black', 'grey60'), 
+                                  length(unique(ALL_bp_win$CHROM_NUM))/2)) +
+  
+  labs(x = 'Position along each chromosome',
+       y = 'Proportion of base pairs covered') 
+  
 
 # Save to external file
-ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/density/combined_per_win_bp_covered.png',
+#ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/density/combined_per_win_bp_covered.png',
+#       width = 2800,
+#       height = 3100,
+#       units = 'px',
+#       dpi = 700
+#)
+
+ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/density/combined_per_win_bp_covered_updated.png',
        width = 2800,
        height = 3100,
        units = 'px',
        dpi = 700
-)
-
-ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/density/combined_per_win_bp_covered.pdf',
-       width = 2800,
-       height = 3100,
-       units = 'px',
-       dpi = 700,
-       device = 'pdf'
+      # device = 'pdf'
 )
 
 # 3. Compute per win bp ratio between SVs and SNPs ------------------------
