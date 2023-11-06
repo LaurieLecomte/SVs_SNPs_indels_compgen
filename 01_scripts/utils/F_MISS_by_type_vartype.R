@@ -230,7 +230,7 @@ ggplot(data = ALL_filt) +
 
 
 ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/F_MISS/ALL_variants_filt_F_MISS_distrib.png',
-       width = 3200,
+       width = 4000,
        height = 3000,
        units = 'px',
        dpi = 700
