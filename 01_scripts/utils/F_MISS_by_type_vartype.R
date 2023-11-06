@@ -31,7 +31,7 @@ ggplot(data = ALL_raw) +
   facet_wrap(vars(factor(var_type, levels = c('SV', 'SNP', 'indel'))), 
              nrow = 3, scales = 'free_y', strip.position = 'right') +
   geom_histogram(aes(x = F_MISS), 
-                 color = 'black', linewidth = 0.1, binwidth = 0.02) +
+                 color = 'black', fill = 'grey70', linewidth = 0.1, binwidth = 0.02) +
   geom_vline(aes(xintercept = F_MISS), data = ALL_raw_medians, linetype = 2, color = 'firebrick') + 
   theme_bw() +
   theme(
@@ -223,7 +223,7 @@ ggplot(data = ALL_filt) +
   ) +
   #guides(fill = 'none') +
   scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
-  scale_fill_manual(values = c('gray50', 'yellow', 'purple4')) +
+  scale_fill_manual(values = c('gray70', 'yellow', 'purple4')) +
   labs(x = 'Missing genotype proportion',
        y = 'Variant count') +
   geom_text(aes(x = F_MISS + 0.08, y = y, label = sprintf("%0.3f", round(F_MISS, digits = 3))), size = 2.5, color = 'firebrick', data = ALL_filt_medians)
