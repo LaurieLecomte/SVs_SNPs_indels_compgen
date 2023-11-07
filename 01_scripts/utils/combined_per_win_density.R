@@ -108,11 +108,10 @@ ALL_dens_win$midBIN <- ALL_dens_win$BIN_START + WIN_SIZE/2
 #       dpi = 700
 #)
 
-ggplot(data = ALL_bp_win) +
+ggplot(data = ALL_dens_win) +
   facet_grid(factor(TYPE, levels = c('SVs', 'SNPs', 'indels')) ~ CHROM_NUM, 
              scales = 'free', space = 'free_x') +
-  geom_point(aes(x = midBIN, y = prop, color = CHROM_NUM),
-             #alpha = 1.5 * ALL_bp_win$prop, 
+  geom_point(aes(x = midBIN, y = DENSITY, color = CHROM_NUM),
              size = 0.04) +
   theme(
     # Panels and background
@@ -147,7 +146,7 @@ ggplot(data = ALL_bp_win) +
   guides(color = 'none') +
   
   scale_color_manual(values = rep(c('black', 'grey60'), 
-                                  length(unique(ALL_bp_win$CHROM_NUM))/2)) +
+                                  length(unique(ALL_dens_win$CHROM_NUM))/2)) +
   labs(x = 'Position along each chromosome',
        y = 'Variant density')
 
