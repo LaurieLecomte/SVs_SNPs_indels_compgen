@@ -122,7 +122,7 @@ ggplot(data = ALL_dens_win) +
     panel.grid = element_blank(),
     
     # Strips
-    strip.text.x.top = element_text(size = 3, 
+    strip.text.x.top = element_text(size = 3.5, 
                                     margin = margin(3,0,3,0, 'pt')),
     strip.text.y.right = element_text(size = 4,
                                       margin = margin(0,1,0,1, 'pt')),
@@ -141,7 +141,7 @@ ggplot(data = ALL_dens_win) +
     
   ) + 
   
-  scale_y_continuous(labels = scales::number_format(accuracy = 0.001)) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   
   guides(color = 'none') +
   

@@ -109,10 +109,10 @@ ALL_Fst_win <- merge(ALL_Fst_win, mean_Fst, by = c('TYPE'))
 #            label = mean_Fst),
 #            size = 1.4, color = 'white')
   
-ggplot(data = ALL_bp_win) +
+ggplot(data = ALL_Fst_win) +
   facet_grid(factor(TYPE, levels = c('SVs', 'SNPs', 'indels')) ~ CHROM_NUM, 
              scales = 'free', space = 'free_x') +
-  geom_point(aes(x = midBIN, y = prop, color = CHROM_NUM),
+  geom_point(aes(x = midPOS, y = FST, color = CHROM_NUM),
              #alpha = 1.5 * ALL_bp_win$prop, 
              size = 0.04) +
   theme(
@@ -124,7 +124,7 @@ ggplot(data = ALL_bp_win) +
     panel.grid = element_blank(),
     
     # Strips
-    strip.text.x.top = element_text(size = 3, 
+    strip.text.x.top = element_text(size = 3.5, 
                                     margin = margin(3,0,3,0, 'pt')),
     strip.text.y.right = element_text(size = 4,
                                       margin = margin(0,1,0,1, 'pt')),
@@ -148,7 +148,7 @@ ggplot(data = ALL_bp_win) +
   guides(color = 'none') +
   
   scale_color_manual(values = rep(c('black', 'grey60'), 
-                                  length(unique(ALL_bp_win$CHROM_NUM))/2)) +
+                                  length(unique(ALL_Fst_win$CHROM_NUM))/2)) +
   labs(x = 'Position along each chromosome',
        y = expression(italic('F'['ST']))
        )
