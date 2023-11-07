@@ -113,7 +113,7 @@ ggplot(data = ALL_Fst_win) +
   facet_grid(factor(TYPE, levels = c('SVs', 'SNPs', 'indels')) ~ CHROM_NUM, 
              scales = 'free', space = 'free_x') +
   geom_point(aes(x = midPOS, y = FST, color = CHROM_NUM),
-             #alpha = 1.5 * ALL_bp_win$prop, 
+             alpha = 1.5 * ALL_Fst_win$FST, 
              size = 0.04) +
   theme(
     # Panels and background
