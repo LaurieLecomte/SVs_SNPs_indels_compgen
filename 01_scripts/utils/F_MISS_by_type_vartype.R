@@ -99,7 +99,7 @@ SV_all <- merge(SV_table, SV_all, by = c('CHROM', 'POS', 'END', 'ID', 'FST', 'F_
 
 SV_all$type <- 
   ifelse(test = is.na(SV_all$type),
-         yes = 'other',
+         yes = 'others',
          no = SV_all$type)
 
 # Plot
@@ -138,7 +138,7 @@ SNP_all <- merge(SNP_table, SNP_all, by = c('CHROM', 'POS', 'END', 'ID', 'FST', 
 
 SNP_all$type <- 
   ifelse(test = is.na(SNP_all$type),
-         yes = 'other',
+         yes = 'others',
          no = SNP_all$type)
 
 # Plot
@@ -174,7 +174,7 @@ indel_all <- merge(indel_table, indel_all, by = c('CHROM', 'POS', 'END', 'ID', '
 
 indel_all$type <- 
   ifelse(test = is.na(indel_all$type),
-         yes = 'other',
+         yes = 'others',
          no = indel_all$type)
 
 # Plot
@@ -225,7 +225,8 @@ ggplot(data = ALL_filt) +
   scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   scale_fill_manual(values = c('gray70', 'yellow', 'purple4')) +
   labs(x = 'Missing genotype proportion',
-       y = 'Variant count') +
+       y = 'Variant count',
+       fill = 'Variant set') +
   geom_text(aes(x = F_MISS + 0.08, y = y, label = sprintf("%0.3f", round(F_MISS, digits = 3))), size = 2.5, color = 'firebrick', data = ALL_filt_medians)
 
 
