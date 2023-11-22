@@ -95,6 +95,14 @@ intersect_both_win_by_homgroup$x.homology_group <- factor(intersect_both_win_by_
                                                                    'High (95 - 97.5%)', 'Very high (97.5 - 100%)')
 )
 
+intersect_both_win_by_homgroup$x.type <- ifelse(intersect_both_win_by_homgroup$x.type == 'excluded',
+                                                          yes = 'filtered out',
+                                                          no = 'kept')
+# Export result table to file
+write.table(file = "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/intersect_hom_RM_win_by_homgroup.table",
+            intersect_both_win_by_homgroup,
+            row.names = FALSE,
+            sep = "\t")
 
 # Plot
 ggplot(data = intersect_both_win_by_homgroup) + 
@@ -106,6 +114,17 @@ ggplot(data = intersect_both_win_by_homgroup) +
   #scale_fill_viridis_d(option = 'H') #+
   #theme(axis.text.x = element_blank(),
    #     axis.ticks.x = element_blank())
+
+
+
+ggplot(data = intersect_both_win_by_homgroup) + 
+  facet_grid(~ x.type, scales = 'free_y') +
+  geom_boxplot(aes(y = n, fill = x.homology_group, x = x.repetitive), 
+               outlier.size = 0.5, linewidth = 0.2, size = 0.5) +
+  labs(y = 'SV count per 10 kb', x = 'SV class', fill = 'Homology (% identity)') +
+  theme_bw() 
+
+
 
 ggplot(data = intersect_both_win_by_homgroup) + 
   #facet_grid(~ x.type, scales = 'free_y') +
@@ -202,6 +221,9 @@ intersect_both_win_by_homgroup_SNPs$x.homology_group <- factor(intersect_both_wi
                                                                    'High (95 - 97.5%)', 'Very high (97.5 - 100%)')
 )
 
+intersect_both_win_by_homgroup_SNPs$x.type <- ifelse(intersect_both_win_by_homgroup_SNPs$x.type == 'excluded',
+                                                yes = 'filtered out',
+                                                no = 'kept')
 
 
 
@@ -209,7 +231,7 @@ ggplot(data = intersect_both_win_by_homgroup_SNPs) +
   facet_grid(~ x.type, scales = 'free_y') +
   geom_boxplot(aes(y = n, fill = x.homology_group, x = x.repetitive), 
                outlier.size = 0.5, linewidth = 0.2, size = 0.5) +
-  labs(y = 'SNP count per 10 kb', x = 'SV class', fill = 'Homology (% identity)') +
+  labs(y = 'SNP count per 10 kb', x = 'SNP class', fill = 'Homology (% identity)') +
   theme_bw() #+
 #theme(axis.text.x = element_blank(),
 #     axis.ticks.x = element_blank())
@@ -217,7 +239,7 @@ ggplot(data = intersect_both_win_by_homgroup_SNPs) +
 ggplot(data = intersect_both_win_by_homgroup_SNPs) + 
   #facet_grid(~ x.type, scales = 'free_y') +
   geom_boxplot(aes(y = n, fill = x.homology, color = x.repetitive, x = x.type), linewidth = 0.2) +
-  labs(y = 'SV count per 10 kb', x = 'SV class', fill = 'Homology (% identity)') +
+  labs(y = 'SNP count per 10 kb', x = 'SNP class', fill = 'Homology (% identity)') +
   theme_bw() +
   scale_color_manual(values = c('black', 'grey50')) 
 #theme(axis.text.x = element_blank(),
