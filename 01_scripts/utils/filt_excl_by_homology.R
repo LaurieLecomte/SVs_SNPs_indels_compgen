@@ -47,12 +47,22 @@ intersect_both$repetitive <- ifelse(is.na(intersect_both$element),
                                     no = 'repetitive')
 
 # Add variable for homology level for SVs overlapping syntenic regions
+intersect_both$wg_hom_pct <- round(intersect_both$wg_hom_pct, digits = 0)
+intersect_both <- subset(intersect_both, wg_hom_pct > 85)
 intersect_both$homology <- as.character(
   cut(intersect_both$wg_hom_pct, 
       breaks = c(85, 90, 95, 97.5, 100), 
       labels = c('Low (85 - 90%)', 'Elevated (90 - 95%)', 
                  'High (95 - 97.5%)', 'Very high (97.5 - 100%)'), 
       right = FALSE)  )
+
+
+# Export result table to file
+write.table(file = "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/intersect_both.table",
+            intersect_both_dt,
+            row.names = FALSE,
+            sep = "\t")
+
 
 
 # Compute density by window
@@ -76,6 +86,7 @@ intersect_both_win <-
 
 ## remove windows where there is nothing
 intersect_both_win <- subset(intersect_both_win, !is.na(x.CHROM))
+
 
 
 ## Get density : count by group  
@@ -136,8 +147,9 @@ ggplot(data = intersect_both_win_by_homgroup) +
   #           axis.ticks.x = element_blank())
 
 
-
-
+ggplot(data = intersect_both) +
+  geom_histogram(aes(x = wg_hom_pct, fill = homology), binwidth = 1)
+table(intersect_both$wg_hom_pct, intersect_both$homology)
 
 
 # Try with newly formatted intersect files for SNPs--------------------------------
