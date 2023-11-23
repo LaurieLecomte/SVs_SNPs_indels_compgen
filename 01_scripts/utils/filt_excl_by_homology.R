@@ -1,12 +1,18 @@
+# Plot kept/excluded variant density in repeats and syntenic regions
+# Required files are produced by the 01_scripts/utils/filt_excl_by_homology.sh script
 
 library(data.table)
 library(ggplot2)
 library(dplyr)
+options(scipen = 999)
 
+MIN_IDY_PCT <- 85 # min % of identity of syntenic regions to consider
+DENS_WIN <- 10000  # size of window for computing variant density
 
+# SVs ---------------------------------------------------------------------
 
+# SV intersection with syntenic and repeats -------------------------------
 
-# Try with newly formatted intersect files for SVs--------------------------------
 # Intersection with syntenic regions
 INTERSECT_HOM <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/win100_filt_excl_SVs_hom_regions.table"
 
@@ -18,6 +24,7 @@ intersect_hom <- read.table(INTERSECT_HOM,
 intersect_hom$ID <- ifelse(intersect_hom$type == 'excluded',
                            yes = paste0(intersect_hom$ID, '_excl'),
                            no = intersect_hom$ID)
+
 
 # Intersection with repeats (RepeatMasker output)
 INTERSECT_RM <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/win100_filt_excl_SVs_RM.table"
@@ -31,7 +38,8 @@ intersect_rm$ID <- ifelse(intersect_rm$type == 'excluded',
                            yes = paste0(intersect_rm$ID, '_excl'),
                            no = intersect_rm$ID)
 
-# Combine both dataset by merging on SV CHROM, POS, END, ID and type (filtered or excluded)
+
+# Combine both datasets by merging on SV CHROM, POS, END, ID and type (filtered or excluded)
 intersect_both <- 
 merge(x = intersect_hom[ c('CHROM', 'POS', 'END', 'ID', 'type', 'hom_pct', 'wg_hom_pct')], 
       y = intersect_rm[, c('CHROM', 'POS', 'END', 'ID', 'type', 'element')],
@@ -46,9 +54,13 @@ intersect_both$repetitive <- ifelse(is.na(intersect_both$element),
                                     yes = 'non-repetitive',
                                     no = 'repetitive')
 
+
 # Add variable for homology level for SVs overlapping syntenic regions
 intersect_both$wg_hom_pct <- round(intersect_both$wg_hom_pct, digits = 0)
-intersect_both <- subset(intersect_both, wg_hom_pct > 85)
+
+# Remove syntenic regions with % identity lower than MIN_IDY_PCT
+intersect_both <- subset(intersect_both, wg_hom_pct > MIN_IDY_PCT)
+
 intersect_both$homology <- as.character(
   cut(intersect_both$wg_hom_pct, 
       breaks = c(85, 90, 95, 97.5, 100), 
@@ -57,22 +69,36 @@ intersect_both$homology <- as.character(
       right = FALSE)  )
 
 
-# Export result table to file
-write.table(file = "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/intersect_both.table",
-            intersect_both_dt,
+intersect_both$homology <- factor(intersect_both$homology, 
+                                       levels=c('Low (85 - 90%)', 'Elevated (90 - 95%)', 
+                                                'High (95 - 97.5%)', 'Very high (97.5 - 100%)')
+)
+
+# Export result table to file : will be used later for plotting an histogram 
+write.table(file = "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/SVs_intersect_both.table",
+            intersect_both,
             row.names = FALSE,
             sep = "\t")
 
 
+ggplot(data = intersect_both) + 
+  geom_histogram(aes(wg_hom_pct, fill = homology), binwidth = 1) +
+  theme_bw() + 
+  labs(x = 'Homology (% identity)') +
+  guides(fill = 'none') +
+  theme(axis.title.y = element_blank()) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE))
 
-# Compute density by window
-## Get windows
-WIN_CHUNKS <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/02_infos/chrs_win100000.bed"
+
+# SV density by window ----------------------------------------------------
+
+# Get windows
+WIN_CHUNKS <- paste0("/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/02_infos/chrs_win", DENS_WIN, '.bed')
 
 win_chunks <- as.data.table(read.table(WIN_CHUNKS,
                                        col.names = c('CHROM', 'START', 'STOP')))
 
-## For each SV, get corresponding window
+# For each SV, get corresponding window
 intersect_both_dt <- as.data.table(intersect_both)
 
 intersect_both_win <- 
@@ -90,37 +116,38 @@ intersect_both_win <- subset(intersect_both_win, !is.na(x.CHROM))
 
 
 ## Get density : count by group  
-intersect_both_win_by_homgroup <-
+by_homgroup <-
   intersect_both_win %>% count(x.CHROM, i.START, i.STOP, 
                                x.type, x.homology, x.repetitive, sort = TRUE)
 
-intersect_both_win_by_homgroup$x.homology_group <- as.character(intersect_both_win_by_homgroup$x.homology)
+by_homgroup$x.homology_group <- as.character(by_homgroup$x.homology)
 
-intersect_both_win_by_homgroup$x.homology_group <- ifelse(is.na(intersect_both_win_by_homgroup$x.homology_group),
+by_homgroup$x.homology_group <- ifelse(is.na(by_homgroup$x.homology_group),
                                                           yes = 'Non-syntenic',
-                                                          no = intersect_both_win_by_homgroup$x.homology_group)
+                                                          no = by_homgroup$x.homology_group)
 
-intersect_both_win_by_homgroup$x.homology_group <- factor(intersect_both_win_by_homgroup$x.homology_group , 
+by_homgroup$x.homology_group <- factor(by_homgroup$x.homology_group , 
                                                           levels=c('Non-syntenic',
                                                                    'Low (85 - 90%)', 'Elevated (90 - 95%)', 
                                                                    'High (95 - 97.5%)', 'Very high (97.5 - 100%)')
 )
 
-intersect_both_win_by_homgroup$x.type <- ifelse(intersect_both_win_by_homgroup$x.type == 'excluded',
+by_homgroup$x.type <- ifelse(by_homgroup$x.type == 'excluded',
                                                           yes = 'filtered out',
                                                           no = 'kept')
-# Export result table to file
-write.table(file = "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/intersect_hom_RM_win_by_homgroup.table",
-            intersect_both_win_by_homgroup,
+
+# Export result table to file, for plotting on a local machine where ggpattern could be installed
+write.table(file = paste0("/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/SVs_by_homgroup_win", DENS_WIN/1000, "kb.table"),
+            by_homgroup,
             row.names = FALSE,
             sep = "\t")
 
 # Plot
-ggplot(data = intersect_both_win_by_homgroup) + 
+ggplot(data = by_homgroup) + 
   facet_grid(~ x.type, scales = 'free_y') +
   geom_boxplot(aes(y = n, fill = x.homology_group, x = x.repetitive), 
                outlier.size = 0.5, linewidth = 0.2, size = 0.5) +
-  labs(y = 'SV count per 10 kb', x = 'SV class', fill = 'Homology (% identity)') +
+  labs(y = paste0('SV count per ', DENS_WIN/1000, ' kb window'), x = 'SV class', fill = 'Homology (% identity)') +
   theme_bw() #+
   #scale_fill_viridis_d(option = 'H') #+
   #theme(axis.text.x = element_blank(),
@@ -128,7 +155,7 @@ ggplot(data = intersect_both_win_by_homgroup) +
 
 
 
-ggplot(data = intersect_both_win_by_homgroup) + 
+ggplot(data = by_homgroup) + 
   facet_grid(~ x.type, scales = 'free_y') +
   geom_boxplot(aes(y = n, fill = x.homology_group, x = x.repetitive), 
                outlier.size = 0.5, linewidth = 0.2, size = 0.5) +
@@ -137,7 +164,7 @@ ggplot(data = intersect_both_win_by_homgroup) +
 
 
 
-ggplot(data = intersect_both_win_by_homgroup) + 
+ggplot(data = by_homgroup) + 
   #facet_grid(~ x.type, scales = 'free_y') +
   geom_boxplot(aes(y = n, fill = x.homology, color = x.repetitive, x = x.type), linewidth = 0.2) +
   labs(y = 'SV count per 10 kb', x = 'SV class', fill = 'Homology (% identity)') +
@@ -152,7 +179,15 @@ ggplot(data = intersect_both) +
 table(intersect_both$wg_hom_pct, intersect_both$homology)
 
 
-# Try with newly formatted intersect files for SNPs--------------------------------
+
+
+
+
+
+
+# SNPs ---------------------------------------------------------------------
+
+# SNP intersection with syntenic and repeats -------------------------------
 INTERSECT_HOM_SNP <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/win100_filt_excl_SNPs_hom_regions.table"
 
 intersect_hom_SNPs <- read.table(INTERSECT_HOM_SNP, 
@@ -184,6 +219,12 @@ intersect_both_SNPs$repetitive <- ifelse(is.na(intersect_both_SNPs$element),
                                     no = 'repetitive')
 
 
+# Add variable for homology level for SVs overlapping syntenic regions
+intersect_both_SNPs$wg_hom_pct <- round(intersect_both_SNPs$wg_hom_pct, digits = 0)
+
+# Remove syntenic regions with % identity lower than MIN_IDY_PCT
+intersect_both_SNPs <- subset(intersect_both_SNPs, wg_hom_pct > MIN_IDY_PCT)
+
 intersect_both_SNPs$homology <- as.character(
   cut(intersect_both_SNPs$wg_hom_pct, 
       breaks = c(85, 90, 95, 97.5, 100), 
@@ -191,8 +232,30 @@ intersect_both_SNPs$homology <- as.character(
                  'High (95 - 97.5%)', 'Very high (97.5 - 100%)'), 
       right = FALSE)  )
 
+intersect_both_SNPs$homology <- factor(intersect_both_SNPs$homology, 
+                                  levels=c('Low (85 - 90%)', 'Elevated (90 - 95%)', 
+                                           'High (95 - 97.5%)', 'Very high (97.5 - 100%)')
+)
 
-WIN_CHUNKS <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/02_infos/chrs_win100000.bed"
+# Export result table to file : will be used later for plotting an histogram 
+write.table(file = "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/SNPs_intersect_both.table",
+            intersect_both_SNPs,
+            row.names = FALSE,
+            sep = "\t")
+
+
+ggplot(data = intersect_both_SNPs) + 
+  geom_histogram(aes(wg_hom_pct, fill = homology), binwidth = 1) +
+  theme_bw() + 
+  labs(x = 'Homology (% identity)') +
+  guides(fill = 'none') +
+  theme(axis.title.y = element_blank()) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE))
+
+
+
+# SNP density by window ---------------------------------------------------
+WIN_CHUNKS <- paste0("/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/02_infos/chrs_win", DENS_WIN, '.bed')
 
 
 win_chunks <- as.data.table(read.table(WIN_CHUNKS,
@@ -217,29 +280,35 @@ intersect_both_win_SNPs <- subset(intersect_both_win_SNPs, !is.na(x.CHROM))
 
 
 ## Get density : count by group  
-intersect_both_win_by_homgroup_SNPs <-
+by_homgroup_SNPs <-
   intersect_both_win_SNPs %>% count(x.CHROM, i.START, i.STOP, 
                                x.type, x.homology, x.repetitive, sort = TRUE)
 
-intersect_both_win_by_homgroup_SNPs$x.homology_group <- as.character(intersect_both_win_by_homgroup_SNPs$x.homology)
+by_homgroup_SNPs$x.homology_group <- as.character(by_homgroup_SNPs$x.homology)
 
-intersect_both_win_by_homgroup_SNPs$x.homology_group <- ifelse(is.na(intersect_both_win_by_homgroup_SNPs$x.homology_group),
+by_homgroup_SNPs$x.homology_group <- ifelse(is.na(by_homgroup_SNPs$x.homology_group),
                                                           yes = 'Non-syntenic',
-                                                          no = intersect_both_win_by_homgroup_SNPs$x.homology_group)
+                                                          no = by_homgroup_SNPs$x.homology_group)
 
-intersect_both_win_by_homgroup_SNPs$x.homology_group <- factor(intersect_both_win_by_homgroup_SNPs$x.homology_group , 
+by_homgroup_SNPs$x.homology_group <- factor(by_homgroup_SNPs$x.homology_group , 
                                                           levels=c('Non-syntenic',
                                                                    'Low (85 - 90%)', 'Elevated (90 - 95%)', 
                                                                    'High (95 - 97.5%)', 'Very high (97.5 - 100%)')
 )
 
-intersect_both_win_by_homgroup_SNPs$x.type <- ifelse(intersect_both_win_by_homgroup_SNPs$x.type == 'excluded',
+by_homgroup_SNPs$x.type <- ifelse(by_homgroup_SNPs$x.type == 'excluded',
                                                 yes = 'filtered out',
                                                 no = 'kept')
 
 
+# Export result table to file, for plotting on a local machine where ggpattern could be installed
+write.table(file = paste0("/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/hom_regions/SNPs_by_homgroup_win", DENS_WIN/1000, "kb.table"),
+            by_homgroup,
+            row.names = FALSE,
+            sep = "\t")
 
-ggplot(data = intersect_both_win_by_homgroup_SNPs) + 
+# Plot
+ggplot(data = by_homgroup_SNPs) + 
   facet_grid(~ x.type, scales = 'free_y') +
   geom_boxplot(aes(y = n, fill = x.homology_group, x = x.repetitive), 
                outlier.size = 0.5, linewidth = 0.2, size = 0.5) +
@@ -248,7 +317,7 @@ ggplot(data = intersect_both_win_by_homgroup_SNPs) +
 #theme(axis.text.x = element_blank(),
 #     axis.ticks.x = element_blank())
 
-ggplot(data = intersect_both_win_by_homgroup_SNPs) + 
+ggplot(data = by_homgroup_SNPs) + 
   #facet_grid(~ x.type, scales = 'free_y') +
   geom_boxplot(aes(y = n, fill = x.homology, color = x.repetitive, x = x.type), linewidth = 0.2) +
   labs(y = 'SNP count per 10 kb', x = 'SNP class', fill = 'Homology (% identity)') +
@@ -256,7 +325,6 @@ ggplot(data = intersect_both_win_by_homgroup_SNPs) +
   scale_color_manual(values = c('black', 'grey50')) 
 #theme(axis.text.x = element_blank(),
 #           axis.ticks.x = element_blank())
-
 
 
 
