@@ -10,15 +10,15 @@ library(data.table)
 RAW_SNP <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/01_short_reads/03_SNP/SNPs_indels_SR/06_merged/SNPs_DP_FMISS_tag.table"
 
 raw_SNPs <- fread(RAW_SNP, col.names = c('CHROM', 'POS', 'DP', 'F_MISS'))
-raw_SNPs$var_type <- 'SNP'
+raw_SNPs$var_type <- 'SNPs'
 
 RAW_INDEL <-  "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/01_short_reads/03_SNP/SNPs_indels_SR/06_merged/indels_DP_FMISS_tag.table"
 raw_indels <- fread(RAW_INDEL, col.names = c('CHROM', 'POS', 'DP', 'F_MISS'))
-raw_indels$var_type <- 'indel'
+raw_indels$var_type <- 'Indels'
 
 RAW_SV <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/genotype_SVs_SRLR/08_merged/merged_SUPP2_genotyped.tagged_DP_FMISS.table"
 raw_SVs <- fread(RAW_SV, col.names = c('CHROM', 'POS', 'DP', 'F_MISS'))
-raw_SVs$var_type <- 'SV'
+raw_SVs$var_type <- 'SVs'
 
 ALL_raw <- rbind(raw_SVs, raw_SNPs, raw_indels)
 
@@ -28,7 +28,7 @@ ALL_raw_medians$F_MISS <- round(ALL_raw_medians$F_MISS, 3)
 ALL_raw_medians$y <- c(1000000, 8000000, 40000)
 
 ggplot(data = ALL_raw) +
-  facet_wrap(vars(factor(var_type, levels = c('SV', 'SNP', 'indel'))), 
+  facet_wrap(vars(factor(var_type, levels = c('SVs', 'SNPs', 'Indels'))), 
              nrow = 3, scales = 'free_y', strip.position = 'right') +
   geom_histogram(aes(x = F_MISS), 
                  color = 'black', fill = 'grey70', linewidth = 0.1, binwidth = 0.02) +
@@ -41,13 +41,15 @@ ggplot(data = ALL_raw) +
     #panel.border = element_rect(color = 'black', fill = NA, linewidth = 0.1),
     #panel.grid = element_blank(),
     
-    strip.text.y.right = element_text(size = 8),
+    strip.text.y.right = element_text(size = 6),
     strip.background.y = element_rect(color = 'black', linewidth = 0.2),
+    plot.caption = element_text(vjust = 64, hjust = -0.12, size = 20),
     
-    #axis.text.x = element_blank(),
-    #axis.text.y = element_text(size = 4),
-    #axis.title.x = element_text(size = 7),
-    #axis.title.y = element_text(size = 7),
+    axis.text.x = element_text(size = 5),
+    axis.text.y = element_text(size = 5),
+    axis.title.x = element_text(size = 7),
+    axis.title.y = element_text(size = 7),
+    
     #axis.ticks.y = element_line(linewidth = 0.3),
     #axis.line.y = element_line(linewidth = 0.1),
     #axis.line.x = element_line(linewidth = 0.1)
@@ -57,13 +59,14 @@ ggplot(data = ALL_raw) +
   scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   #scale_fill_viridis_d(option = 'E') +
   labs(x = 'Missing genotype proportion',
-       y = 'Variant count') +
+       y = 'Variant count',
+       caption = 'A') +
   geom_text(aes(x = F_MISS + 0.08, y = y, label = sprintf("%0.3f", round(F_MISS, digits = 3))), 
             size = 2.5, color = 'firebrick', data = ALL_raw_medians)
 
 ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/F_MISS/ALL_variants_raw_F_MISS_distrib.png',
-       width = 3200,
-       height = 3000,
+       width = 3400,
+       height = 2800,
        units = 'px',
        dpi = 700
        # device = 'pdf'
@@ -185,9 +188,9 @@ ggplot(data = indel_all) +
 
 
 # All variants together, filtered and by categories -----------------------
-SV_all$var_type <- 'SV'
-SNP_all$var_type <- 'SNP'
-indel_all$var_type <- 'indel'
+SV_all$var_type <- 'SVs'
+SNP_all$var_type <- 'SNPs'
+indel_all$var_type <- 'Indels'
 
 ALL_filt <- rbind(SV_all, SNP_all, indel_all)
 
@@ -196,7 +199,7 @@ ALL_filt_medians <- aggregate(data = ALL_filt, F_MISS ~ var_type, FUN = median)
 ALL_filt_medians$y <- c(100000, 1035000, 15500)
 
 ggplot(data = ALL_filt) +
-  facet_wrap(vars(factor(var_type, levels = c('SV', 'SNP', 'indel'))), 
+  facet_wrap(vars(factor(var_type, levels = c('SVs', 'SNPs', 'Indels'))), 
              nrow = 3, scales = 'free_y', strip.position = 'right') +
   geom_histogram(aes(x = F_MISS, fill = type), 
                  color = 'black', linewidth = 0.1, binwidth = 0.02) +
@@ -209,31 +212,38 @@ ggplot(data = ALL_filt) +
     #panel.border = element_rect(color = 'black', fill = NA, linewidth = 0.1),
     #panel.grid = element_blank(),
     
-    strip.text.y.right = element_text(size = 8),
+    strip.text.y.right = element_text(size = 6),
     strip.background.y = element_rect(color = 'black', linewidth = 0.2),
+    plot.caption = element_text(vjust = 64, hjust = -0.14, size = 20),
     
-    #axis.text.x = element_blank(),
-    #axis.text.y = element_text(size = 4),
-    #axis.title.x = element_text(size = 7),
-    #axis.title.y = element_text(size = 7),
+    axis.text.x = element_text(size = 5),
+    axis.text.y = element_text(size = 5),
+    axis.title.x = element_text(size = 7),
+    axis.title.y = element_text(size = 7),
+    
     #axis.ticks.y = element_line(linewidth = 0.3),
     #axis.line.y = element_line(linewidth = 0.1),
     #axis.line.x = element_line(linewidth = 0.1)
-    
+    legend.text = element_text(size = 5),
+    legend.title = element_text(size = 6),
+    legend.key.size = unit(0.3, 'cm')
   ) +
   #guides(fill = 'none') +
   scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   scale_fill_manual(values = c('gray70', 'yellow', 'purple4')) +
   labs(x = 'Missing genotype proportion',
        y = 'Variant count',
-       fill = 'Variant set') +
+       fill = 'Variant set',
+       caption = 'B') +
   geom_text(aes(x = F_MISS + 0.08, y = y, label = sprintf("%0.3f", round(F_MISS, digits = 3))), size = 2.5, color = 'firebrick', data = ALL_filt_medians)
 
 
+
 ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/F_MISS/ALL_variants_filt_F_MISS_distrib.png',
-       width = 4000,
-       height = 3000,
+       width = 3400,
+       height = 2800,
        units = 'px',
        dpi = 700
        # device = 'pdf'
 )
+
