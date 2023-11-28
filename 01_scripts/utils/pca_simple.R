@@ -101,7 +101,7 @@ plot_PC1_PC3 <- ggplot(data = pca_df, aes(x = PC1, y = PC3, label = ID)) +
   geom_point(aes(col = POP, shape = factor(cluster))) +
   geom_text(size = 1.5, hjust = 0, 
             nudge_x = -0.002, nudge_y = 0.002, check_overlap = TRUE) +
-  labs(y = paste("PC3", var2), x = paste("PC1", var1), 
+  labs(y = paste("PC3", var3), x = paste("PC1", var1), 
        title = paste("k_SS" ,k_ss) ) +
   scale_color_manual(values = c("red", "blue"))
 plot_PC1_PC3
@@ -112,7 +112,7 @@ plot_PC2_PC3 <- ggplot(data = pca_df, aes(x = PC2, y = PC3, label = ID)) +
   geom_point(aes(col = POP, shape = factor(cluster))) +
   geom_text(size = 1.5, hjust = 0, 
             nudge_x = -0.002, nudge_y = 0.002, check_overlap = TRUE) +
-  labs(y = paste("PC3", var2), x = paste("PC2", var1), 
+  labs(y = paste("PC3", var3), x = paste("PC2", var2), 
        title = paste("k_SS" ,k_ss) ) +
   scale_color_manual(values = c("red", "blue"))
 plot_PC2_PC3
@@ -132,7 +132,7 @@ pca_df$POP <- as.factor(pca_df$POP)
 
 library(ggpubr)
 plot_PC1_2 <- 
-ggplot(data = pca_df, aes(x = PC1, y = PC2, label = ID)) +
+ggplot(data = pca_df, aes(x = round(PC1, 2), y = round(PC2, 2), label = ID)) +
   geom_point(aes(col = POP, shape = POP)) +
   stat_ellipse(linewidth = 0.5, aes(group = POP, col = POP), show.legend = FALSE) + 
   labs(y = paste0("PC2 (", var2, ' %)'), x = paste0("PC1 (", var1, ' %)'),
@@ -142,3 +142,14 @@ ggplot(data = pca_df, aes(x = PC1, y = PC2, label = ID)) +
 saveRDS(plot_PC1_2, file = paste0(strsplit(x = COV_MAT, split = '.cov')[[1]],
                                     "_PC1_PC2_formatted.rds"))
 
+
+plot_PC1_3 <- 
+ggplot(data = pca_df, aes(x = round(PC1, 2), y = round(PC3, 2), label = ID)) +
+  geom_point(aes(col = POP, shape = POP)) +
+  stat_ellipse(linewidth = 0.5, aes(group = POP, col = POP), show.legend = FALSE) + 
+  labs(y = paste0("PC3 (", var3, ' %)'), x = paste0("PC1 (", var1, ' %)'),
+       color = 'Population', shape = 'Population') +
+  scale_color_manual(values = c("red", "blue"))
+
+saveRDS(plot_PC1_3, file = paste0(strsplit(x = COV_MAT, split = '.cov')[[1]],
+                                    "_PC1_PC3_formatted.rds"))

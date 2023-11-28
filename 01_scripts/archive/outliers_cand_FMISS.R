@@ -31,13 +31,19 @@ SV_all <- merge(SV_table, SV_all, by = c('CHROM', 'POS', 'END', 'ID', 'FST', 'F_
 
 SV_all$type <- 
 ifelse(test = is.na(SV_all$type),
-                    yes = 'other SVs',
+                    yes = 'other',
        no = SV_all$type)
 
 # Plot
 ggplot(data = SV_all) +
   geom_boxplot(aes(x = type, y = F_MISS))
 
+ggplot(data = SV_all) +
+  geom_histogram(aes(x = F_MISS, fill = type), color = 'black', linewidth = 0.1, binwidth = 0.02) +
+  geom_vline(xintercept = median(SV_all$F_MISS)) +
+  theme_bw() +
+  labs(x = 'Missing data proportion',
+       y = 'Variant count')
 
 # SNPs --------------------------------------------------------------------
 ALL_SNP <- "~/projects/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/08_angsd_fst/SNPs/SNPs_MAF0.05_FMISS0.5.SNPsFst_RO_PU_FST_FMISS.table"
@@ -67,7 +73,7 @@ SNP_all <- merge(SNP_table, SNP_all, by = c('CHROM', 'POS', 'END', 'ID', 'FST', 
 
 SNP_all$type <- 
   ifelse(test = is.na(SNP_all$type),
-         yes = 'other SNPs',
+         yes = 'other',
          no = SNP_all$type)
 
 # Plot
@@ -103,9 +109,124 @@ indel_all <- merge(indel_table, indel_all, by = c('CHROM', 'POS', 'END', 'ID', '
 
 indel_all$type <- 
   ifelse(test = is.na(indel_all$type),
-         yes = 'other indels',
+         yes = 'other',
          no = indel_all$type)
 
 # Plot
 ggplot(data = indel_all) +
   geom_boxplot(aes(x = type, y = F_MISS))
+
+
+
+
+# All variants together ---------------------------------------------------
+library(data.table)
+
+# All variants together, RAW variants -------------------------------------
+# Import and format
+RAW_SNP <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/01_short_reads/03_SNP/SNPs_indels_SR/06_merged/SNPs_DP_FMISS_tag.table"
+
+raw_SNPs <- fread(RAW_SNP, col.names = c('CHROM', 'POS', 'DP', 'F_MISS'))
+raw_SNPs$var_type <- 'SNP'
+
+RAW_INDEL <-  "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/01_short_reads/03_SNP/SNPs_indels_SR/06_merged/indels_DP_FMISS_tag.table"
+raw_indels <- fread(RAW_INDEL, col.names = c('CHROM', 'POS', 'DP', 'F_MISS'))
+raw_indels$var_type <- 'indel'
+
+RAW_SV <- "/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/genotype_SVs_SRLR/08_merged/merged_SUPP2_genotyped.tagged_DP_FMISS.table"
+raw_SVs <- fread(RAW_SV, col.names = c('CHROM', 'POS', 'DP', 'F_MISS'))
+raw_SVs$var_type <- 'SV'
+
+ALL_raw <- rbind(raw_SVs, raw_SNPs, raw_indels)
+
+ALL_raw_medians <- aggregate(data = ALL_raw, F_MISS ~ var_type, FUN = median)
+ALL_raw_medians$F_MISS <- round(ALL_raw_medians$F_MISS, 3)
+
+ALL_raw_medians$y <- c(1000000, 8000000, 40000)
+
+ggplot(data = ALL_raw) +
+  facet_wrap(vars(factor(var_type, levels = c('SV', 'SNP', 'indel'))), 
+             nrow = 3, scales = 'free_y', strip.position = 'right') +
+  geom_histogram(aes(x = F_MISS, fill = var_type), 
+                 color = 'black', linewidth = 0.1, binwidth = 0.02) +
+  geom_vline(aes(xintercept = F_MISS), data = ALL_raw_medians, linetype = 2, color = 'firebrick') + 
+  theme_bw() +
+  theme(
+    #panel.spacing.x = unit(0.6, 'points'),
+    #panel.spacing.y = unit(3, 'points'),
+    #panel.background = element_blank(),
+    #panel.border = element_rect(color = 'black', fill = NA, linewidth = 0.1),
+    #panel.grid = element_blank(),
+    
+    strip.text.y.right = element_text(size = 8),
+    strip.background.y = element_rect(color = 'black', linewidth = 0.2),
+    
+    #axis.text.x = element_blank(),
+    #axis.text.y = element_text(size = 4),
+    #axis.title.x = element_text(size = 7),
+    #axis.title.y = element_text(size = 7),
+    #axis.ticks.y = element_line(linewidth = 0.3),
+    #axis.line.y = element_line(linewidth = 0.1),
+    #axis.line.x = element_line(linewidth = 0.1)
+    
+  ) +
+  guides(fill = 'none') +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  scale_fill_viridis_d(option = 'E') +
+  labs(x = 'Missing genotype proportion',
+       y = 'Variant count') +
+  geom_text(aes(x = F_MISS + 0.05, y = y, label = sprintf("%0.3f", round(F_MISS, digits = 3))), 
+            size = 2.5, color = 'firebrick', data = ALL_raw_medians)
+
+ggsave(filename = '/mnt/ibis/lbernatchez/users/lalec31/RDC_Romaine/03_SR_LR/SVs_SNPs_indels_compgen/F_MISS/ALL_variants_F_MISS_distrib.png',
+       width = 3100,
+       height = 3100,
+       units = 'px',
+       dpi = 700
+       # device = 'pdf'
+)
+
+
+# All variants together, filtered and by categories -----------------------
+SV_all$var_type <- 'SV'
+SNP_all$var_type <- 'SNP'
+indel_all$var_type <- 'indel'
+
+ALL_filt <- rbind(SV_all, SNP_all, indel_all)
+
+ALL_filt_medians <- aggregate(data = ALL_filt, F_MISS ~ var_type, FUN = median)
+#ALL_filt_medians$F_MISS <- ALL_filt_medians$F_MISS
+ALL_filt_medians$y <- c(100000, 1035000, 15500)
+
+ggplot(data = ALL_filt) +
+  facet_wrap(vars(factor(var_type, levels = c('SV', 'SNP', 'indel'))), 
+             nrow = 3, scales = 'free_y', strip.position = 'right') +
+  geom_histogram(aes(x = F_MISS, fill = type), 
+                 color = 'black', linewidth = 0.1, binwidth = 0.02) +
+  geom_vline(aes(xintercept = F_MISS), data = ALL_filt_medians, linetype = 2, color = 'firebrick') + 
+  theme_bw() +
+  theme(
+    #panel.spacing.x = unit(0.6, 'points'),
+    #panel.spacing.y = unit(3, 'points'),
+    #panel.background = element_blank(),
+    #panel.border = element_rect(color = 'black', fill = NA, linewidth = 0.1),
+    #panel.grid = element_blank(),
+    
+    strip.text.y.right = element_text(size = 8),
+    strip.background.y = element_rect(color = 'black', linewidth = 0.2),
+    
+    #axis.text.x = element_blank(),
+    #axis.text.y = element_text(size = 4),
+    #axis.title.x = element_text(size = 7),
+    #axis.title.y = element_text(size = 7),
+    #axis.ticks.y = element_line(linewidth = 0.3),
+    #axis.line.y = element_line(linewidth = 0.1),
+    #axis.line.x = element_line(linewidth = 0.1)
+    
+  ) +
+  #guides(fill = 'none') +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  scale_fill_viridis_d(option = 'D') +
+  labs(x = 'Missing genotype proportion',
+       y = 'Variant count') +
+  geom_text(aes(x = F_MISS + 0.03, y = y, label = sprintf("%0.3f", round(F_MISS, digits = 3))), size = 2.5, color = 'firebrick', data = ALL_filt_medians)

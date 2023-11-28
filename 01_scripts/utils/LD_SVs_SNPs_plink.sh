@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Estimate fraction of genome consisting of either variants types
+# 
 
 # srun -p small -c 3 -J LD_SVs_SNPs_plink -o log/LD_SVs_SNPs_plink_%j.log /bin/sh 01_scripts/utils/LD_SVs_SNPs_plink.sh &
 
-# srun -p small -c 3 --mem=100G -J LD_SVs_SNPs_plink -o log/LD_SVs_SNPs_plink_%j.log /bin/sh 01_scripts/utils/LD_SVs_SNPs_plink.sh &
+# srun -p small -c 3 --mem=200G -J LD_SVs_SNPs_plink -o log/LD_SVs_SNPs_plink_%j.log /bin/sh 01_scripts/utils/LD_SVs_SNPs_plink.sh &
 
 # parallel -a 02_infos/chr_list.txt -j 10 srun -p small -c 3 -J LD_SVs_SNPs_plink_{} -o log/LD_SVs_SNPs_plink_{}_%j.log /bin/sh 01_scripts/utils/LD_SVs_SNPs_plink.sh {} &
 
@@ -17,16 +17,17 @@ SV_VCF="$VCF_DIR/SVs/merged_SUPP2_MAF0.05_FMISS0.5.vcf.gz"
 SNP_VCF="$VCF_DIR/SNPs/SNPs_MAF0.05_FMISS0.5.vcf.gz"
 
 
-LD_DIR="LD/SVs_vs_SNPs"
+LD_DIR="LD"
 
 MAX_DIST=100000
 
-CPU=5
+CPU=3
 
 # LOAD REQUIRED MODULES
 module load bcftools/1.13
 module load python/3.7
 module load plink
+module load bedtools
 
 if [[ ! -d $LD_DIR ]]
 then
@@ -45,34 +46,39 @@ fi
 #bcftools concat -f $LD_DIR/LD_SVs_SNPs_"$CHR"_list.txt | bcftools sort -Oz > $LD_DIR/LD_SVs_SNPs_"$CHR".vcf.gz
 
 
-# Run plink
-#plink -r2 --allow-extra-chr --ld-window-kb 1000 --vcf $LD_DIR/LD_SVs_SNPs_"$CHR".vcf.gz --threads $CPU --out $LD_DIR/LD_SVs_SNPs_"$CHR"
-
-
-
-
-# Replace POS by middle position between POS and END for SV larger than MAX_WIDTH
 MAX_WIDTH=200
-#Rscript 01_scripts/utils/recode_SVs_fromVCF.R $SV_VCF $VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf $MAX_WIDTH
-
-#bgzip $VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf 
-#tabix -p vcf $VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf.gz 
-
-# Concatenate SVs and SNPs
-#echo -e "$VCF_DIR/SVs/"$(basename -s .vcf.gz $SV_VCF)"_recodedPOS_"$MAX_WIDTH"bp.vcf.gz\n$SNP_VCF" > $LD_DIR/LD_SVs_SNPs_list.txt
-
-#bcftools concat -f $LD_DIR/LD_SVs_SNPs_list.txt --threads $CPU -a | bcftools sort -Oz > $LD_DIR/SVs_SNPs_concat.vcf.gz
 
 
-WIN_KB=1000
-
-plink --r2 --allow-extra-chr --ld-window 99999 --ld-window-kb $WIN_KB --ld-window-r2 0 --vcf $LD_DIR/SVs_SNPs_concat.vcf.gz --threads $CPU --out $LD_DIR/SVs_SNPs_concat_"$WIN_KB"
+WIN_KB=100
 
 
 
 
 
 
+# Try with no recoding of SV POS, and pre-remove SNPs overlapping with SVs
+
+## Convert SNPs and SVs to bed
+#
+
+bcftools query -f '%CHROM\t%POS0\t%END\t%ID\n' $SV_VCF > "${SV_VCF%.vcf.gz}".bed
+#bcftools query -f '%CHROM\t%POS0\t%END\n' $SNP_VCF > "${SNP_VCF%.vcf.gz}".bed
+
+
+## Remove SNPs overlapping with a SV
+#bedtools window -a $SNP_VCF -b $SV_VCF -w 10 -v -header | bcftools sort -Oz > $LD_DIR/non_overlapping_SNPs_10bp.vcf.gz
+#tabix -p vcf $LD_DIR/non_overlapping_SNPs_10bp.vcf.gz
+
+## Concatenate non overlapping SNPs and SVs together
+#echo -e "$SV_VCF\n$LD_DIR/non_overlapping_SNPs_10bp.vcf.gz" > $LD_DIR/LD_SVs_SNPs_list.txt
+#bcftools concat -f $LD_DIR/LD_SVs_SNPs_list.txt --threads $CPU -a | bcftools sort -Oz > $LD_DIR/SVs_SNPs_concat_no_overlap.vcf.gz
+
+
+#plink --r2 --allow-extra-chr --chr $CHR --ld-window 100 --ld-window-kb $WIN_KB --ld-window-r2 0 --vcf $LD_DIR/SVs_vs_SNPs/SVs_SNPs_concat_no_overlap.vcf.gz --threads $CPU --out $LD_DIR/SVs_SNPs_concat_"$WIN_KB"_$CHR
+
+
+# For SNPs only 
+plink --r2 --allow-extra-chr --chr $CHR --ld-window 100 --ld-window-kb $WIN_KB --ld-window-r2 0 --vcf $SNP_VCF --threads $CPU --out $LD_DIR/SNPs_vs_SNPs/SNPs_"$WIN_KB"_$CHR
 
 
 

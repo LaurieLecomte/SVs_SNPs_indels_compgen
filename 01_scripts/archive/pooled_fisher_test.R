@@ -28,7 +28,7 @@ genoind <- data.frame(fread(paste(genofile, ".indv", sep=""), stringsAsFactors =
 popmap <- data.frame(fread(popfile, stringsAsFactors = FALSE,header = FALSE,
                            col.names = c('ID', 'POP')))
 
-chr_pos_end_ID <- as.data.frame(fread(CHR_POS_END_ID, stringsAsFactors = FALSE,header = FALSE, 
+chr_pos_end_ID <- data.frame(fread(CHR_POS_END_ID, stringsAsFactors = FALSE,header = FALSE, 
                                    col.names = c('CHROM', 'POS', 'END', 'ID') ))
 
 
@@ -67,14 +67,8 @@ genoind$pop <- merge(genoind, popmap, sort = FALSE)[, 2]
 genopos$P_VAL <- unlist(apply(genotype, 2 , fisher_function, pop = genoind$pop))
 genopos$Q_VAL <- p.adjust(genopos$P_VAL, method = "BH")
 
-write.table(genopos, 
-                        file = paste0(out_file, '_genopos.txt'), sep = "\t",
-                        row.names = FALSE, quote = FALSE)
-                        
 # Merge with original sites list, including END field
-#genopos <- merge(genopos, chr_pos_end_ID, by = c('CHROM', 'POS', 'ID'), sort = FALSE)
-
-genopos <- cbind(genopos, END = chr_pos_end_ID$END, ID = chr_pos_end_ID$ID)
+genopos <- merge(genopos, chr_pos_end_ID, by = c('CHROM', 'POS'), sort = FALSE)
 
 #write.table(genopos[, c('CHROM', 'POS', 'END', 'ID', 'P_VAL', 'Q_VAL')], 
 #            file = paste0(out_dir, '/', unlist(strsplit(basename(genofile), split = '.geno_mat.012'))[1], ".fisher.txt"), sep = "\t",
