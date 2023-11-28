@@ -64,3 +64,14 @@ This pipeline uses sets of genotyped variants outputted by 3 pipelines :
 2. Identify **syntenic regions** due to whole genome duplication by performing whole-genome self alignment : `01_scripts/utils/nucmer_symap_addedN.sh` (this script also comes from another local and private repo). This script first "patches" a problematic region preventing successful alignment.
 3. Get the % identity (homology level) of syntenic regions by mapping them to each other : `01_scripts/utils/lastz_align_blocks.sh` and `01_scripts/utils/homology_by_win.R` (these scripts also come from another local and private repo and are based on previous work by [Xavier Dallaire et al. (2023)](https://www.biorxiv.org/content/10.1101/2023.07.27.550877v1))
 4. Get the overlap between good and bad SVs with syntenic regions and/or repeats, compute variant density by filtered/excluded status and by window, then plot : `01_scripts/utils/filt_excl_by_homology.sh` and `01_scripts/utils/filt_excl_by_homology.R`
+
+### Compare missing data distribution variant groups
+
+See script `01_scripts/utils/F_MISS_by_type_vartype.R` 
+
+
+### Get LD decay between SVs and SNPs
+Scripts `01_scripts/utils/LD_SVs_SNPs_plink.sh` and `LD_add_SV_info.R` to compute R^2 and add SV info to the table outputted by `plink`.
+LD decay plot and confidence intervals were done by Florent Sylvestre. 
+
+  
