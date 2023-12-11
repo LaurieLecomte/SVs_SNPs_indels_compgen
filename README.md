@@ -71,7 +71,8 @@ See script `01_scripts/utils/F_MISS_by_type_vartype.R`
 
 
 ### Get LD decay between SVs and SNPs
-Scripts `01_scripts/utils/LD_SVs_SNPs_plink.sh` and `LD_add_SV_info.R` to compute R^2 and add SV info to the table outputted by `plink`.
-LD decay plot and confidence intervals were done by Florent Sylvestre. 
+1. Calculate _r^2_ between SVs and SNPs and between SNPs : `01_scripts/utils/LD_SVs_SNPs_plink.sh`
+2. Add SV info to the table outputted by `plink` :  `01_scripts/utils/LD_add_SV_info.R`
+3. Format and reorder output table and perform bootstrap on per-window median _r^2_ to get confidence intervals, then plot : `01_scripts/utils/reorder_LD.py`, `01_scripts/utils/LD_analysis.R` (these scripts were produced by Florent Sylvestre)
 
   
